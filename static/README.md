@@ -1,0 +1,1 @@
+This directory contains the generated matrixPortaalLocaties.json from a shapefile which exports a (geo)json. In a terminal executing `php generateMatrixPortaalLocaties.php` this is generated in here since it takes quite some time. We use that file as base to later add the live data in.

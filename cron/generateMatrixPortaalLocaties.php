@@ -41,8 +41,8 @@ function findCloseCoordinates($pMatrixBordLocaties, $pLat, $pLon) {
 $sLocationsJsonContents = file_get_contents($jsonMatrixLocatiesJsonFile);
 $oLocationsOfMatrixPortals = json_decode($sLocationsJsonContents);
 $sLocationsJsonContents = null;
-//echo '<pre>5497<br /><br />';
 $matrixBordLocaties = $matrixBordLocatiesClassed = [];
+
 foreach ($oLocationsOfMatrixPortals->features as $matrixBordLocatie) {
 	$lat = round(floatval($matrixBordLocatie->geometry->coordinates[1]), 12);
 	$lon = round(floatval($matrixBordLocatie->geometry->coordinates[0]), 12);
@@ -64,8 +64,8 @@ foreach ($oLocationsOfMatrixPortals->features as $matrixBordLocatie) {
 	$matrixBordLocaties [$coords][$location][$matrixBordLocatie->properties->uuid] = $properties->lane;
 	asort($matrixBordLocaties [$coords][$location]);
 	ksort($matrixBordLocaties [$coords]);
-	//var_dump($matrixBordLocaties [$coords]);die();
 }
+
 $roadLocationArray = [];
 foreach ($matrixBordLocaties as $coordinates => $matrixBordLocatie) {
 	$roadLocation = new RoadLocation();
