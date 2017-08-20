@@ -21,10 +21,12 @@ class RoadWay {
 	public $lanes; // type: array (of Lane)
 }
 
-class Lane {
-	public $uuid; // type: string
-	
-	public $number; // type: int
+class VmsInfo {
+	public $uuid; // type: string	
 	
 	public $shownSign; // type: string
+}
+
+class Lane extends VmsInfo {
+	public $number; // type: int
 }

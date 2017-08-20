@@ -67,7 +67,8 @@ function getImageNameForSignShown ($display)
 		}
 	}
 	
-	return $imageName . '.png';
+//	return $imageName . '.png';
+	return $imageName;
 }
 
 $sLiveXmlContents = file_get_contents($xmlFile);
@@ -75,32 +76,17 @@ $oLiveMatrixData = simplexml_load_string(str_ireplace('ndw:', '', str_ireplace('
 $events = $oLiveMatrixData->Body->NdwVms->variable_message_sign_events->event;
 
 $matrixBorden = [];
-$portalLocations = [];
 foreach ($events as $matrixBord) {
-	if (isset($matrixBord->display)) {
-		$guid = (string)$matrixBord->sign_id->uuid;
-		$matrixBorden[$guid] = getImageNameForSignShown($matrixBord->display);
-	}
-	else
+	if (!isset($matrixBord->display))
 		continue;
+
+	$vmsInfo = new VmsInfo();
+	$vmsInfo->uuid = (string)$matrixBord->sign_id->uuid;
+	$vmsInfo->shownSign = getImageNameForSignShown($matrixBord->display);
+	
+	$matrixBorden[] = $vmsInfo;
 }
 $sLiveXmlContents = $oLiveMatrixData = $events = null;
 
-$mpls = file_get_contents($jsonMatrixPortaalLocatiesJsonFile);
-$matrixPortaalLocaties = json_decode($mpls);
-
-foreach ($matrixPortaalLocaties as $matrixPortaalLocatie) {
-	foreach ($matrixPortaalLocatie->matrixPortal->roadWays as $roadWay) {
-		foreach ($roadWay->lanes as $lane) {
-			if (array_key_exists ($lane->uuid, $matrixBorden)) {
-				$lane->shownSign = $matrixBorden[$lane->uuid];
-			}
-		}
-	}
-}
-
-//var_dump($matrixPortaalLocaties);
-
-file_put_contents($jsonMatrixBordenOutputPath, '' . json_encode($matrixPortaalLocaties) . '');
-$matrixLocaties = null;
+file_put_contents($jsonMatrixBordenOutputPath, json_encode($matrixBorden));
 die();

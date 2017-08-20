@@ -1,0 +1,1 @@
+This directory also contains a (geo)json file exported from the shapefile with locations of the variable message signs. It is used by generateMatrixPortaalLocaties.php to generate the static/matrixPortaalLocaties.json for the front-end to know where markers should be placed on the map.

@@ -101,9 +101,6 @@
 				top: 39px !important;
 				width: 93px;
 				text-align: center;
-				/*position: absolute !important;
-				bottom: 0px !important;
-				right: 447px !important;*/
 			}
 		</style>
 	</head>
@@ -131,10 +128,11 @@
 					iwContent = iwContent + roadWay.hmLocation + '<br />';
 					
 					roadWay.lanes.forEach(function (lane) {
-						var shownSign = 'onbekend.png';
+						var shownSign = 'onbekend';
 						if (lane.shownSign != null)
 							shownSign = lane.shownSign;
-						iwContent = iwContent + '<img src="MSI-afbeeldingen/' + shownSign + '" title="Rijstrook ' + lane.number + '" />&nbsp;';
+						
+						iwContent = iwContent + '<img src="MSI-afbeeldingen/' + shownSign + '.png" title="Rijstrook ' + lane.number + '" id="' + lane.uuid + '" />&nbsp;';
 					});
 					iwContent = iwContent + '<br />';
 				});
@@ -144,6 +142,7 @@
 
 			var map;
 			var matrixPortalPoints = new Map();
+			var liveMatrixBorden = [];
 			function initMap() {
 				map = new google.maps.Map(document.getElementById('map'), {
 					zoom: 9,
@@ -213,9 +212,6 @@
 				});
 				
 				google.maps.event.addListener(map, 'idle', function() {
-//					if (map.zoom < 14)
-//						return;
-
 					matrixPortalPoints.forEach(function (matrixLocatie) {
 						if ((matrixLocatie.marker.position.lat() > map.getBounds().f.b && matrixLocatie.marker.position.lat() < map.getBounds().f.f)
 						&& (matrixLocatie.marker.position.lng() > map.getBounds().b.b && matrixLocatie.marker.position.lng() < map.getBounds().b.f)
@@ -223,6 +219,7 @@
 							if (!matrixLocatie.isVisible) {
 								matrixLocatie.marker.setMap(map);
 								matrixLocatie.infoWindow.open(map, matrixLocatie.marker);
+								matrixLocatie.updateLiveMatrixImage(matrixLocatie.infoWindow.getContent());
 								matrixLocatie.isVisible = true;
 							}
 						}
@@ -240,11 +237,16 @@
 				trafficLayer.setMap(map);
 				
 				loadMatrixen();
-				setInterval(loadMatrixen, 1001*60*2);
 			}
 
 			function loadMatrixen () {
-				loadJson('live/matrixBorden.json', function(response) {
+				loadStaticMatrixen();
+				loadLiveMatrixInfo();
+				setInterval(loadLiveMatrixInfo, 1001*60*2);
+			}
+			
+			function loadStaticMatrixen () {
+				loadJson('static/matrixPortaalLocaties.json', function(response) {
 					var matrixPortalLocations = JSON.parse(response);
 					
 					matrixPortalLocations.forEach (function (matrixPortalLocation) {
@@ -263,16 +265,40 @@
 							matrixPortalPoint.marker.addListener('click', function() {
 								matrixPortalPoint.infoWindow.open(map, matrixPortalPoint.marker);
 							});
+							matrixPortalPoint.updateLiveMatrixImage = updateLiveMatrixImage;
 							
 							matrixPortalPoints.set(coordinate, matrixPortalPoint);
 						}
-						else {
-							var matrixPortalPoint = matrixPortalPoints.get(coordinate);
-							matrixPortalPoint.infoWindow.setContent(getInfoWindowContent(matrixPortalLocation.matrixPortal.roadWays));
+					});
+				});
+			}
+			
+			function loadLiveMatrixInfo () {
+				loadJson('live/matrixBorden.json', function(response) {
+					var liveMatrixBordenJson = JSON.parse(response);
+					
+					liveMatrixBordenJson.forEach (function (liveMatrixBord) {
+						liveMatrixBorden[liveMatrixBord.uuid] = liveMatrixBord.shownSign;
+					});
+					
+					matrixPortalPoints.forEach(function (matrixLocatie) {
+						if (matrixLocatie.isVisible) {
+							matrixLocatie.updateLiveMatrixImage(matrixLocatie.infoWindow.getContent());
 						}
 					});
 				});
-			};
+			}
+			
+			function updateLiveMatrixImage(infoWindowContent) {
+				var html = document.createElement('div');
+				html.innerHTML = infoWindowContent;
+				var imgList = Array.from(html.getElementsByTagName('img'));
+				imgList.forEach(function (imgTag) {
+					//setTimeout (function () { document.getElementById(imgTag.id).src = 'MSI-afbeeldingen/' + liveMatrixBorden[imgTag.id] + '.png'; }, 1);
+					document.getElementById(imgTag.id).src = 'MSI-afbeeldingen/' + liveMatrixBorden[imgTag.id] + '.png';
+					
+				});
+			}
 		</script>
 		<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3sSJDNgn0zezcAxPqWcrW5wyT67QUkyg&callback=initMap&region=NL&libraries=places"></script>
 	</body>

@@ -92,6 +92,5 @@ foreach ($matrixBordLocaties as $coordinates => $matrixBordLocatie) {
 	$roadLocationArray[] = $roadLocation;
 }
 
-//var_dump($roadLocationArray);
 file_put_contents($jsonMatrixPortaalLocatiesJsonFile, json_encode($roadLocationArray));
 die();
