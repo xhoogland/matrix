@@ -6,9 +6,9 @@ if (!$debugMode) {
 	chdir($cronDir);
 }
 
-ini_set('max_execution_time', 120);
+ini_set('max_execution_time', 90);
 
-if (!file_exists ($jsonMatrixLocatiesJsonFile)) {
+if (!file_exists ($rawLocations['matrix']) && !file_exists ($rawLocations['drip'])) {
 	die();
 }
 
@@ -38,10 +38,10 @@ function findCloseCoordinates($pMatrixBordLocaties, $pLat, $pLon) {
 	return [$pLat . '_' .  $pLon, $pMatrixBordLocaties];
 }
 
-$sLocationsJsonContents = file_get_contents($jsonMatrixLocatiesJsonFile);
+$sLocationsJsonContents = file_get_contents($rawLocations['matrix']);
 $oLocationsOfMatrixPortals = json_decode($sLocationsJsonContents);
 $sLocationsJsonContents = null;
-$matrixBordLocaties = $matrixBordLocatiesClassed = [];
+$locaties = $locatiesClassed = [];
 
 foreach ($oLocationsOfMatrixPortals->features as $matrixBordLocatie) {
 	$lat = round(floatval($matrixBordLocatie->geometry->coordinates[1]), 12);
@@ -54,20 +54,41 @@ foreach ($oLocationsOfMatrixPortals->features as $matrixBordLocatie) {
 	$location = $road . ' ' . $side . ' ' . $km;
 
 	$coords = null;
-	$returnValue = findCloseCoordinates($matrixBordLocaties, $lat, $lon);
+	$returnValue = findCloseCoordinates($locaties, $lat, $lon);
 	$coords = $returnValue[0];
-	$matrixBordLocaties = $returnValue[1];
+	$locaties = $returnValue[1];
 	if ($coords == null)
 		$coords = $lat . '_' . $lon;
 	
 	
-	$matrixBordLocaties [$coords][$location][$matrixBordLocatie->properties->uuid] = $properties->lane;
-	asort($matrixBordLocaties [$coords][$location]);
-	ksort($matrixBordLocaties [$coords]);
+	$locaties [$coords][$location][$properties->uuid] = $properties->lane;
+	asort($locaties [$coords][$location]);
+	ksort($locaties [$coords]);
+}
+
+// DRIPlocations
+$sDripLocationsXmlContents = file_get_contents($rawLocations['drip']);
+$oDripLocationsData = simplexml_load_string(str_ireplace('soap:', '', $sDripLocationsXmlContents));
+$vmsUnitRecords = $oDripLocationsData->Body->d2LogicalModel->payloadPublication->vmsUnitTable->vmsUnitRecord;
+
+foreach ($vmsUnitRecords as $vmsUnitRecord) {
+	$vmsRecord = $vmsUnitRecord->vmsRecord->vmsRecord;
+	$locationForDisplay = $vmsRecord->vmsLocation->locationForDisplay;
+//	if (!isset($vmsLocation))
+//		continue;
+
+	$locationValue = (string)$vmsRecord->vmsDescription->values->value;
+	$idArray = explode ('_', $vmsUnitRecord->attributes()->id);
+
+	$coords = $locationForDisplay->latitude . '_' . $locationForDisplay->longitude;
+	$location = explode(' ', $locationValue, 2)[1];
+	$uuid = array_reverse($idArray)[0];
+
+	$locaties [$coords][$location][$uuid] = 'DRIP';
 }
 
 $roadLocationArray = [];
-foreach ($matrixBordLocaties as $coordinates => $matrixBordLocatie) {
+foreach ($locaties as $coordinates => $locatie) {
 	$roadLocation = new RoadLocation();
 	
 	$coordinate = new Coordinate();
@@ -77,7 +98,7 @@ foreach ($matrixBordLocaties as $coordinates => $matrixBordLocatie) {
 	$roadLocation->coordinate = $coordinate;
 	
 	$matrixPortal = new MatrixPortal();
-	foreach ($matrixBordLocatie as $hmLocation => $lanes) {
+	foreach ($locatie as $hmLocation => $lanes) {
 		$roadWay = new RoadWay();
 		$roadWay->hmLocation = $hmLocation;
 		foreach ($lanes as $uuid => $number) {

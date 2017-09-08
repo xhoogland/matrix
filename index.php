@@ -128,11 +128,14 @@
 					iwContent = iwContent + roadWay.hmLocation + '<br />';
 					
 					roadWay.lanes.forEach(function (lane) {
-						var shownSign = 'onbekend';
-						if (lane.shownSign != null)
-							shownSign = lane.shownSign;
-						
-						iwContent = iwContent + '<img src="MSI-afbeeldingen/' + shownSign + '.png" title="Rijstrook ' + lane.number + '" id="' + lane.uuid + '" />&nbsp;';
+						var shownSign = 'MSI-afbeeldingen/leeg.png';
+						var laneNumber = 'Rijstrook ' + lane.number;
+						if (lane.number == 'DRIP') {
+							shownSign = '';
+							laneNumber = lane.number;
+						}
+
+						iwContent = iwContent + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + lane.uuid + '" />&nbsp;';
 					});
 					iwContent = iwContent + '<br />';
 				});
@@ -294,9 +297,11 @@
 				html.innerHTML = infoWindowContent;
 				var imgList = Array.from(html.getElementsByTagName('img'));
 				imgList.forEach(function (imgTag) {
-					//setTimeout (function () { document.getElementById(imgTag.id).src = 'MSI-afbeeldingen/' + liveMatrixBorden[imgTag.id] + '.png'; }, 1);
-					document.getElementById(imgTag.id).src = 'MSI-afbeeldingen/' + liveMatrixBorden[imgTag.id] + '.png';
-					
+					var element = document.getElementById(imgTag.id);
+					if (element.title != 'DRIP')
+						element.src = 'MSI-afbeeldingen/' + liveMatrixBorden[imgTag.id] + '.png';
+					else
+						element.src = liveMatrixBorden[imgTag.id];
 				});
 			}
 		</script>

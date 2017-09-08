@@ -2,13 +2,12 @@
 include('config.php');
 include('classes.php');
 
-if (!$debugMode) {
-	chdir($cronDir);
-	file_put_contents($packedFile, file_get_contents($openDataUrl));
+function unpackGzFile($pOpenDataUrl, $pPackedFile, $pXmlFile) {
+	file_put_contents($pPackedFile, file_get_contents($pOpenDataUrl));
 	
 	$bufferSize = 1024;
-	$inXmlGzFile = gzopen($packedFile, 'rb');
-	$outXmlFile = fopen($xmlFile, 'wb'); 
+	$inXmlGzFile = gzopen($pPackedFile, 'rb');
+	$outXmlFile = fopen($pXmlFile, 'wb');
 
 	while (!gzeof($inXmlGzFile)) {
 		fwrite($outXmlFile, gzread($inXmlGzFile, $bufferSize));
@@ -19,12 +18,18 @@ if (!$debugMode) {
 	$outXmlFile = $inXmlGzFile = null;
 }
 
-if (!file_exists ($jsonMatrixPortaalLocatiesJsonFile)) {
-	die();
+if (!$debugMode) {
+	chdir($cronDir);
+
+	unpackGzFile($openDataUrl['matrix'], $packedFile['matrix'], $xmlFile['matrix']);
+	unpackGzFile($openDataUrl['drip'], $packedFile['drip'], $xmlFile['drip']);
 }
 
-function getImageNameForSignShown ($display)
-{
+//if (!file_exists ($jsonMatrixPortaalLocatiesJsonFile)) {
+//	die();
+//}
+
+function getImageNameForSignShown ($display) {
 	$imageName = 'onbekend';
 	$tag = null;
 	// built in flashers...
@@ -67,15 +72,22 @@ function getImageNameForSignShown ($display)
 		}
 	}
 	
-//	return $imageName . '.png';
 	return $imageName;
 }
 
-$sLiveXmlContents = file_get_contents($xmlFile);
+function getDataUrlForDripShown ($imageData) {
+	$mimeType = $imageData->mimeType;
+	$encoding = $imageData->encoding;
+	$binary = $imageData->binary;
+
+	return 'data:' . $mimeType . ';' . $encoding . ',' . $binary;// . '==';
+}
+
+$sLiveXmlContents = file_get_contents($xmlFile['matrix']);
 $oLiveMatrixData = simplexml_load_string(str_ireplace('ndw:', '', str_ireplace('soap:', '', $sLiveXmlContents)));
 $events = $oLiveMatrixData->Body->NdwVms->variable_message_sign_events->event;
 
-$matrixBorden = [];
+$signs = [];
 foreach ($events as $matrixBord) {
 	if (!isset($matrixBord->display))
 		continue;
@@ -84,9 +96,29 @@ foreach ($events as $matrixBord) {
 	$vmsInfo->uuid = (string)$matrixBord->sign_id->uuid;
 	$vmsInfo->shownSign = getImageNameForSignShown($matrixBord->display);
 	
-	$matrixBorden[] = $vmsInfo;
+	$signs[] = $vmsInfo;
 }
 $sLiveXmlContents = $oLiveMatrixData = $events = null;
 
-file_put_contents($jsonMatrixBordenOutputPath, json_encode($matrixBorden));
+$sLiveXmlContents = file_get_contents($xmlFile['drip']);
+$oLiveDripData = simplexml_load_string(str_ireplace('soap:', '', $sLiveXmlContents));
+$vmsUnits = $oLiveDripData->Body->d2LogicalModel->payloadPublication->vmsUnit;
+
+foreach ($vmsUnits as $vmsUnit) {
+	$vmsMessageExtension = $vmsUnit->vms->vms->vmsMessage->vmsMessage->vmsMessageExtension;
+	if (!isset($vmsMessageExtension))
+		continue;
+
+	$idArray = explode ('_', $vmsUnit->vmsUnitReference->attributes()->id);
+	$uuid = array_reverse($idArray)[0];
+
+	$vmsInfo = new VmsInfo();
+	$vmsInfo->uuid = $uuid;
+	$vmsInfo->shownSign = getDataUrlForDripShown($vmsMessageExtension->vmsMessageExtension->vmsImage->imageData);
+
+	$signs[] = $vmsInfo;
+}
+$sLiveXmlContents = $oLiveDripData = $vmsUnits = null;
+
+file_put_contents($jsonMatrixBordenOutputPath, json_encode($signs));
 die();
