@@ -62,6 +62,7 @@ foreach ($oLocationsOfMatrixPortals->features as $matrixBordLocatie) {
 	
 	
 	$locaties [$coords][$location][$properties->uuid] = $properties->lane;
+
 	asort($locaties [$coords][$location]);
 	ksort($locaties [$coords]);
 }
@@ -74,8 +75,8 @@ $vmsUnitRecords = $oDripLocationsData->Body->d2LogicalModel->payloadPublication-
 foreach ($vmsUnitRecords as $vmsUnitRecord) {
 	$vmsRecord = $vmsUnitRecord->vmsRecord->vmsRecord;
 	$locationForDisplay = $vmsRecord->vmsLocation->locationForDisplay;
-//	if (!isset($vmsLocation))
-//		continue;
+	if (!$locationForDisplay)
+		continue;
 
 	$locationValue = (string)$vmsRecord->vmsDescription->values->value;
 	$idArray = explode ('_', $vmsUnitRecord->attributes()->id);

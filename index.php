@@ -4,108 +4,11 @@
 		<meta charset="UTF-8">
 		<title>Matrix</title>
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-		<style>
-			#map {
-				height: 100%;
-			}
-
-			html, body {
-				height: 100%;
-				margin: 0;
-				padding: 0;
-			}
-			
-			#description {
-				font-family: Roboto;
-				font-size: 15px;
-				font-weight: 300;
-			}
-
-			#infowindow-content .title {
-				font-weight: bold;
-			}
-
-			#infowindow-content {
-				display: none;
-			}
-
-			#map #infowindow-content {
-				display: inline;
-			}
-
-			.pac-card {
-				margin: 10px 10px 0 0;
-				border-radius: 2px 0 0 2px;
-				box-sizing: border-box;
-				-moz-box-sizing: border-box;
-				outline: none;
-				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-				background-color: #fff;
-				font-family: Roboto;
-			}
-
-			#pac-container {
-				padding-bottom: 12px;
-				margin-right: 12px;
-			}
-
-			.pac-controls {
-				display: inline-block;
-				padding: 5px 11px;
-			}
-
-			.pac-controls label {
-				font-family: Roboto;
-				font-size: 13px;
-				font-weight: 300;
-			}
-
-			#searchBox {
-				background-color: #fff;
-				font-family: Roboto;
-				font-size: 15px;
-				font-weight: 300;
-				margin-left: 12px;
-				padding: 0 11px 0 13px;
-				text-overflow: ellipsis;
-				width: 200px;
-				top: 9.4px !important;
-				height: 26.2px;
-				left: 92px !important;
-			}
-
-			#searchBox:focus {
-				border-color: #4d90fe;
-			}
-
-			#title {
-				color: #fff;
-				background-color: #4d90fe;
-				font-size: 25px;
-				font-weight: 500;
-				padding: 6px 12px;
-			}
-			
-			#target {
-				width: 345px;
-			}
-			
-			#signsCopyGert {
-				font-family: Roboto, Arial, sans-serif;
-				color: rgb(68, 68, 68);
-				font-size: 10px;
-				background: #fff;
-				opacity: 0.7;
-				padding: 1px;
-				left: 10px !important;
-				top: 39px !important;
-				width: 93px;
-				text-align: center;
-			}
-		</style>
+		<link rel="stylesheet" href="index.css" />
 	</head>
 	<body>
-		<input id="searchBox" class="controls" type="text" placeholder="Search" />
+		<input id="searchBox" type="text" placeholder="Search" />
+		<div id="permaLink"><a id="permaLinkAnchorHref">PL</a></div>
 		<div id="map"></div>
 		<!--<div id="signsCopyGert">Signs &copy; by Gert</div>-->
 		<script>
@@ -128,6 +31,7 @@
 					iwContent = iwContent + roadWay.hmLocation + '<br />';
 					
 					roadWay.lanes.forEach(function (lane) {
+						debugger;
 						var shownSign = 'MSI-afbeeldingen/leeg.png';
 						var laneNumber = 'Rijstrook ' + lane.number;
 						if (lane.number == 'DRIP') {
@@ -147,9 +51,15 @@
 			var matrixPortalPoints = new Map();
 			var liveMatrixBorden = [];
 			function initMap() {
+				var mapValues = {
+					lat: parseFloat(getParamByName('lat') || 52.3393958),
+					lon: parseFloat(getParamByName('lon') || 5.3028748),
+					zoom: parseFloat(getParamByName('zoom') || 9)
+				};
+				
 				map = new google.maps.Map(document.getElementById('map'), {
-					zoom: 9,
-					center: new google.maps.LatLng(52.3393958,5.3028748),
+					zoom: mapValues.zoom,
+					center: new google.maps.LatLng(mapValues.lat, mapValues.lon),
 					mapTypeId: 'hybrid'
 				});
 
@@ -159,6 +69,9 @@
 				
 				var signsCopyGertDiv = document.getElementById('signsCopyGert');
 				map.controls[google.maps.ControlPosition.TOP_LEFT].push(signsCopyGertDiv);
+
+				var permaLinkDiv = document.getElementById('permaLink');
+				map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(permaLinkDiv);
 
 				// Bias the SearchBox results towards current map's viewport.
 				map.addListener('bounds_changed', function() {
@@ -214,7 +127,7 @@
 					map.fitBounds(bounds);
 				});
 				
-				google.maps.event.addListener(map, 'idle', function() {
+				google.maps.event.addListener(map, 'idle', function () {
 					matrixPortalPoints.forEach(function (matrixLocatie) {
 						if ((matrixLocatie.marker.position.lat() > map.getBounds().f.b && matrixLocatie.marker.position.lat() < map.getBounds().f.f)
 						&& (matrixLocatie.marker.position.lng() > map.getBounds().b.b && matrixLocatie.marker.position.lng() < map.getBounds().b.f)
@@ -234,6 +147,8 @@
 							}
 						}
 					});
+					
+					updatePermaLinkAnchorHref();
 				});
 				
 				var trafficLayer = new google.maps.TrafficLayer();
@@ -244,12 +159,11 @@
 
 			function loadMatrixen () {
 				loadStaticMatrixen();
-				loadLiveMatrixInfo();
 				setInterval(loadLiveMatrixInfo, 1001*60*2);
 			}
 			
 			function loadStaticMatrixen () {
-				loadJson('static/matrixPortaalLocaties.json', function(response) {
+				loadJson('static/matrixPortaalLocaties.json?1509741368', function(response) {
 					var matrixPortalLocations = JSON.parse(response);
 					
 					matrixPortalLocations.forEach (function (matrixPortalLocation) {
@@ -273,11 +187,12 @@
 							matrixPortalPoints.set(coordinate, matrixPortalPoint);
 						}
 					});
+					loadLiveMatrixInfo(true);
 				});
 			}
 			
-			function loadLiveMatrixInfo () {
-				loadJson('live/matrixBorden.json', function(response) {
+			function loadLiveMatrixInfo (firstLoad) {
+				loadJson('live/matrixBorden.json?' + Math.floor(Date.now() / 1000), function(response) {
 					var liveMatrixBordenJson = JSON.parse(response);
 					
 					liveMatrixBordenJson.forEach (function (liveMatrixBord) {
@@ -289,6 +204,10 @@
 							matrixLocatie.updateLiveMatrixImage(matrixLocatie.infoWindow.getContent());
 						}
 					});
+					
+					if (firstLoad === true) {
+						google.maps.event.trigger(map, 'idle');
+					}
 				});
 			}
 			
@@ -303,6 +222,24 @@
 					else
 						element.src = liveMatrixBorden[imgTag.id];
 				});
+			}
+			
+			function updatePermaLinkAnchorHref () {
+				var plAnchor = document.getElementById('permaLinkAnchorHref');
+				plAnchor.href = '?lat=' + map.center.lat().toFixed(5) + '&lon=' + map.center.lng().toFixed(5) + '&zoom=' + map.zoom;
+			}
+			
+			function getParamByName(name) {
+				name = name.replace(/[\[\]]/g, '\\$&');
+				
+				var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+				
+				var results = regex.exec(window.location.href);
+				if (!results || !results[2])  {
+					return null;
+				}
+				
+				return decodeURIComponent(results[2].replace(/\+/g, ' '));
 			}
 		</script>
 		<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3sSJDNgn0zezcAxPqWcrW5wyT67QUkyg&callback=initMap&region=NL&libraries=places"></script>
