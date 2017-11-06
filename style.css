@@ -53,6 +53,18 @@ html, body {
 	font-weight: 300;
 }
 
+#title {
+	color: #fff;
+	background-color: #4d90fe;
+	font-size: 25px;
+	font-weight: 500;
+	padding: 6px 12px;
+}
+
+#target {
+	width: 345px;
+}
+
 #searchBox {
 	background-color: #fff;
 	font-family: Roboto;
@@ -71,16 +83,10 @@ html, body {
 	border-color: #4d90fe;
 }
 
-#title {
-	color: #fff;
-	background-color: #4d90fe;
-	font-size: 25px;
-	font-weight: 500;
-	padding: 6px 12px;
-}
-
-#target {
-	width: 345px;
+#typeShown {
+	left: 10px !important;
+	top: 39px !important;
+	height: 31px;
 }
 
 #signsCopyGert {
@@ -118,7 +124,8 @@ html, body {
 		left: 104px !important;
 	}
 	
-	#permaLink {
-		/* Implement */
+	#typeShown {
+		top: 45px !important;
+		width: 107px;
 	}
 }
