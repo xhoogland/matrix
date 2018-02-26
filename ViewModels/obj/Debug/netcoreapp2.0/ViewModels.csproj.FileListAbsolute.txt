@@ -1,9 +1,0 @@
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\bin\Debug\netcoreapp2.0\ViewModels.deps.json
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\bin\Debug\netcoreapp2.0\ViewModels.dll
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\bin\Debug\netcoreapp2.0\ViewModels.pdb
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.csprojResolveAssemblyReference.cache
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.csproj.CoreCompileInputs.cache
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.AssemblyInfoInputs.cache
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.AssemblyInfo.cs
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.dll
-D:\Dropbox\.NET Projecten\Matrix\ViewModels\obj\Debug\netcoreapp2.0\ViewModels.pdb
