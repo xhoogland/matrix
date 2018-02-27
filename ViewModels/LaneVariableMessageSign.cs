@@ -3,6 +3,5 @@
     public class LaneVariableMessageSign : VariableMessageSign
     {
         public int Number { get; set; }
-
     }
 }

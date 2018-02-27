@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Matrix.Parsers;
+using System;
+using System.Linq;
 
 namespace LocationsGenerator
 {
@@ -6,7 +8,9 @@ namespace LocationsGenerator
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var interfaceImplemented = typeof(ILocationParser);
+            var parsers = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes()).Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                .Select(t => Activator.CreateInstance(t)).ToList();
         }
     }
 }
