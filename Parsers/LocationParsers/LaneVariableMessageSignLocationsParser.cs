@@ -1,10 +1,15 @@
-﻿using System;
-using Matrix.ViewModels;
+﻿using Matrix.ViewModels;
+using System;
 
 namespace Matrix.Parsers.LocationParsers
 {
     class LaneVariableMessageSignLocationsParser : ILocationParser
     {
+        public LaneVariableMessageSignLocationsParser()
+        {
+            var gzFileToExtract = ParserHelper.GetLvmsConfig().GetSection("packedGzFile");
+        }
+
         public float GetKm()
         {
             throw new NotImplementedException();
