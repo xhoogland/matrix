@@ -1,4 +1,4 @@
-﻿namespace FileModels.LaneVariableMessageSignLocations
+﻿namespace Matrix.FileModels.LaneControlSignalLocations
 {
     public class Properties
     {

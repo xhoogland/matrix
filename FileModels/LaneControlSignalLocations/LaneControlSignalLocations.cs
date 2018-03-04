@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace FileModels.LaneVariableMessageSignLocations
+namespace Matrix.FileModels.LaneControlSignalLocations
 {
-    public class LaneVariableMessageSignLocations
+    public class LaneControlSignalLocations
     {
         public string Type { get; set; }
 

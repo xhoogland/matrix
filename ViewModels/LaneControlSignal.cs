@@ -1,6 +1,6 @@
 ﻿namespace Matrix.ViewModels
 {
-    public class LaneVariableMessageSign : VariableMessageSign
+    public class LaneControlSignal : VariableMessageSign
     {
         public int Number { get; set; }
     }

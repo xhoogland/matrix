@@ -1,20 +1,10 @@
-﻿using Matrix.ViewModels;
-using System;
+﻿using Matrix.FileModels;
+using System.Collections.Generic;
 
 namespace Matrix.Parsers
 {
     public interface ILocationParser
     {
-        Location GetLocation();
-
-        string GetRoadName();
-
-        string GetRoadSide();
-
-        float GetKm();
-
-        Guid GetUuid();
-
-        int GetLane();
+        IEnumerable<ILocation> Locations { get; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FileModels.LaneVariableMessageSignLocations
+namespace Matrix.FileModels.LaneControlSignalLocations
 {
     public class Geometry
     {
