@@ -9,40 +9,27 @@ namespace Matrix.FileModels.VariableMessageSignLocations
 
         public VmsRecordVmsRecord VmsRecord { get; set; }
 
-        public string Id { get; set; }
-
         public byte Version { get; set; }
 
-        public bool HasLocation => throw new NotImplementedException();
+        public bool HasLocation => VmsRecord.VmsRecord.VmsLocation != null &&
+                                   VmsRecord.VmsRecord.VmsLocation.LocationForDisplay != null &&
+                                   VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude != 0 &&
+                                   VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude != 0;
 
-        public float GetKm()
+        public Location Location => new Location
         {
-            throw new NotImplementedException();
-        }
+            Latitude = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude,
+            Longitude = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
+        };
 
-        public int GetLane()
-        {
-            throw new NotImplementedException();
-        }
+        public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Value.Split(' ')[1];
 
-        public Location GetLocation()
-        {
-            throw new NotImplementedException();
-        }
+        public string RoadSide => null;
 
-        public string GetRoadName()
-        {
-            throw new NotImplementedException();
-        }
+        public float? Km => null;
 
-        public string GetRoadSide()
-        {
-            throw new NotImplementedException();
-        }
+        public string Id { get; set; }
 
-        public string GetId()
-        {
-            throw new NotImplementedException();
-        }
+        public int? Lane => null;
     }
 }

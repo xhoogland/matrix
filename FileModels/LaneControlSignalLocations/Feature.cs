@@ -13,42 +13,24 @@ namespace Matrix.FileModels.LaneControlSignalLocations
 
         public Geometry Geometry { get; set; }
 
-        public bool HasLocation => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2;
+        public bool HasLocation => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2 &&
+                                   Geometry.Coordinates.Last() != 0 && Geometry.Coordinates.First() != 0;
 
-        public float GetKm()
+        public float? Km => Properties.Km;
+
+        public int? Lane => Properties.Lane;
+
+        public Location Location => new Location
         {
-            return Properties.Km;
-        }
+            Latitude = Geometry.Coordinates.Last(),
+            Longitude = Geometry.Coordinates.First()
 
-        public int GetLane()
-        {
-            return Properties.Lane;
-        }
+        };
 
-        public Location GetLocation()
-        {
-            var coordinates = Geometry.Coordinates;
-            return new Location
-            {
-                Latitude = coordinates.Last(),
-                Longitude = coordinates.First()
+        public string RoadName => Properties.Road;
 
-            };
-        }
+        public string RoadSide => Properties.Carriagew0;
 
-        public string GetRoadName()
-        {
-            return Properties.Road;
-        }
-
-        public string GetRoadSide()
-        {
-            return Properties.Carriagew0;
-        }
-
-        public string GetId()
-        {
-            return Properties.Uuid;
-        }
+        public string Id => Properties.Uuid;
     }
 }

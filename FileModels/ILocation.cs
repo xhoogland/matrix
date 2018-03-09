@@ -4,17 +4,17 @@ namespace Matrix.FileModels
 {
     public interface ILocation
     {
-        Location GetLocation();
+        Location Location { get; }
 
-        string GetRoadName();
+        string RoadName { get; }
 
-        string GetRoadSide();
+        string RoadSide { get; }
 
-        float GetKm();
+        float? Km { get; }
 
-        string GetId();
+        string Id { get; }
 
-        int GetLane();
+        int? Lane { get; }
 
         bool HasLocation { get; }
     }

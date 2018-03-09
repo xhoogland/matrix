@@ -2,6 +2,6 @@
 {
     public class VariableMessageSignLocations
     {
-        public EnvelopeBody Body { get; set; }
+        public EnvelopeBody SOAPBody { get; set; }
     }
 }
