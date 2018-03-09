@@ -23,7 +23,7 @@ namespace LocationsGenerator
                     var loc = location.GetLocation();
                     var roadName = location.GetRoadName();
                     var roadSide = location.GetRoadSide();
-                    var uuid = location.GetUuid();
+                    var uuid = location.GetId();
                 }
             }
         }

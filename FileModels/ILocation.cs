@@ -12,8 +12,10 @@ namespace Matrix.FileModels
 
         float GetKm();
 
-        string GetUuid();
+        string GetId();
 
         int GetLane();
+
+        bool HasLocation { get; }
     }
 }

@@ -6,6 +6,6 @@ namespace Matrix.FileModels.LaneControlSignalLocations
     {
         public string Type { get; set; }
 
-        public IEnumerable<float> Coordinates { get; set; }
+        public IEnumerable<double> Coordinates { get; set; }
     }
 }

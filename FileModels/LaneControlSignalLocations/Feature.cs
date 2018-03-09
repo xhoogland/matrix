@@ -5,11 +5,15 @@ namespace Matrix.FileModels.LaneControlSignalLocations
 {
     public class Feature : ILocation
     {
+        private bool _hasLocation;
+
         public string Type { get; set; }
 
         public Properties Properties { get; set; }
 
         public Geometry Geometry { get; set; }
+
+        public bool HasLocation => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2;
 
         public float GetKm()
         {
@@ -42,7 +46,7 @@ namespace Matrix.FileModels.LaneControlSignalLocations
             return Properties.Carriagew0;
         }
 
-        public string GetUuid()
+        public string GetId()
         {
             return Properties.Uuid;
         }
