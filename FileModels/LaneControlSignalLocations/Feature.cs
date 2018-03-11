@@ -1,29 +1,28 @@
-﻿using Matrix.ViewModels;
+﻿using Matrix.Interfaces;
+using Matrix.SpecificImplementations;
 using System.Linq;
 
 namespace Matrix.FileModels.LaneControlSignalLocations
 {
-    public class Feature : ILocation
+    public class Feature : Location
     {
-        private bool _hasLocation;
-
         public string Type { get; set; }
 
         public Properties Properties { get; set; }
 
         public Geometry Geometry { get; set; }
 
-        public bool HasLocation => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2 &&
+        public bool HasCoordinates => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2 &&
                                    Geometry.Coordinates.Last() != 0 && Geometry.Coordinates.First() != 0;
 
         public float? Km => Properties.Km;
 
         public int? Lane => Properties.Lane;
 
-        public Location Location => new Location
+        public Coordinates Coordinates => new GpsCoordinates
         {
-            Latitude = Geometry.Coordinates.Last(),
-            Longitude = Geometry.Coordinates.First()
+            X = Geometry.Coordinates.Last(),
+            Y = Geometry.Coordinates.First()
 
         };
 

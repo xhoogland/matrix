@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Matrix.Interfaces;
+using System.Collections.Generic;
 
 namespace Matrix.ViewModels
 {
     public class VariableMessageSignPortal
     {
-        public Location Location { get; set; }
+        public Coordinates Coordinates { get; set; }
 
         public string Country { get; set; }
 

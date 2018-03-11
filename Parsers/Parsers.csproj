@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FileModels\FileModels.csproj" />
-    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

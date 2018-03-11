@@ -1,10 +1,8 @@
-﻿using Matrix.ViewModels;
-
-namespace Matrix.FileModels
+﻿namespace Matrix.Interfaces
 {
-    public interface ILocation
+    public interface Location
     {
-        Location Location { get; }
+        Coordinates Coordinates { get; }
 
         string RoadName { get; }
 
@@ -16,6 +14,6 @@ namespace Matrix.FileModels
 
         int? Lane { get; }
 
-        bool HasLocation { get; }
+        bool HasCoordinates { get; }
     }
 }

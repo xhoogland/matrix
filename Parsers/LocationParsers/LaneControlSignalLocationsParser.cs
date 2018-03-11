@@ -1,14 +1,14 @@
-﻿using Matrix.FileModels;
-using Matrix.FileModels.LaneControlSignalLocations;
+﻿using Matrix.FileModels.LaneControlSignalLocations;
+using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    class LaneControlSignalLocationsParser : ILocationParser
+    class LaneControlSignalLocationsParser : LocationParser
     {
-        public IEnumerable<ILocation> Locations { get; }
+        public IEnumerable<Location> Locations { get; }
 
         public LaneControlSignalLocationsParser()
         {

@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "ViewModels\Vi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsers", "Parsers\Parsers.csproj", "{70600BB7-36E7-4D2A-91A5-C7EA17458942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileModels", "FileModels\FileModels.csproj", "{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileModels", "FileModels\FileModels.csproj", "{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{41A4B017-0491-41A6-B367-352BA96E7756}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecificImplementations", "SpecificImplementations\SpecificImplementations.csproj", "{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41A4B017-0491-41A6-B367-352BA96E7756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41A4B017-0491-41A6-B367-352BA96E7756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41A4B017-0491-41A6-B367-352BA96E7756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41A4B017-0491-41A6-B367-352BA96E7756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,9 @@
-﻿using System;
-using Matrix.ViewModels;
+﻿using Matrix.Interfaces;
+using Matrix.SpecificImplementations;
 
 namespace Matrix.FileModels.VariableMessageSignLocations
 {
-    public class VmsUnitRecord : ILocation
+    public class VmsUnitRecord : Location
     {
         public byte NumberOfVms { get; set; }
 
@@ -11,15 +11,15 @@ namespace Matrix.FileModels.VariableMessageSignLocations
 
         public byte Version { get; set; }
 
-        public bool HasLocation => VmsRecord.VmsRecord.VmsLocation != null &&
+        public bool HasCoordinates => VmsRecord.VmsRecord.VmsLocation != null &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay != null &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude != 0 &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude != 0;
 
-        public Location Location => new Location
+        public Coordinates Coordinates => new GpsCoordinates
         {
-            Latitude = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude,
-            Longitude = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
+            X = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude,
+            Y = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
         };
 
         public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Value.Split(' ')[1];
