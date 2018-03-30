@@ -1,31 +1,23 @@
 ﻿using Matrix.Interfaces;
+using Matrix.Parsers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
-namespace LocationsGenerator
+namespace Matrix.LocationsGenerator
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var interfaceImplemented = typeof(LocationParser);
-            //var a = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
-            var assemblyTypes = AppDomain.CurrentDomain.GetAssemblies().Select(a => a);
-            var parsers = new List<LocationParser>();
-            foreach (object assemblyType in assemblyTypes)
-            {
-                var o = assemblyType as LocationParser;
-                if (o != null)
-                {
-                    parsers.Add(o);
-                }
-            }
+            // By calling something from the Parsers-dll, we ensure having it - and
+            // used types - available in the list returned by GetAssemblies.
+            var parsersName = ParserHelper.GetAssemblyName();
 
-            //var classes = assemblies
-            //    .Where(t => interfaceImplemented.IsAssignableFrom(t));// && !t.IsAbstract && !t.IsInterface);
-           // var parsers = classes.Select(Activator.CreateInstance).ToList();
+            var interfaceImplemented = typeof(LocationParser);
+            var parsers = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == parsersName).SelectMany(t => t.GetTypes())
+                          .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                          .Select(Activator.CreateInstance).ToList();
+            //var parsers = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName == parsersName).ExportedTypes;
 
             foreach (LocationParser parser in parsers)
             {

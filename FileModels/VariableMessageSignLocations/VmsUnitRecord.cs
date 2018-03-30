@@ -22,7 +22,7 @@ namespace Matrix.FileModels.VariableMessageSignLocations
             Y = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
         };
 
-        public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Value.Split(' ')[1];
+        public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Text.Split(' ')[1];
 
         public string RoadSide => null;
 

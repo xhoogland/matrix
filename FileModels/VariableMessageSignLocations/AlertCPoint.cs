@@ -2,6 +2,8 @@
 {
     public class AlertCPoint
     {
+        public string XsiType { get; set; }
+
         public byte AlertCLocationCountryCode { get; set; }
 
         public decimal AlertCLocationTableNumber { get; set; }

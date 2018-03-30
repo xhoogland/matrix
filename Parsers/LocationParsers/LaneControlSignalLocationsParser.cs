@@ -13,7 +13,7 @@ namespace Matrix.Parsers.LocationParsers
         public LaneControlSignalLocationsParser()
         {
             var jsonContent = File.ReadAllText("matrixLocaties.json");
-            var data = JsonConvert.DeserializeObject<List<LaneControlSignalLocations>>(jsonContent)[0];
+            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(jsonContent);
             Locations = data.Features;
         }
     }

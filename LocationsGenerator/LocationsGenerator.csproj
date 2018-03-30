@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
+    <ProjectReference Include="..\Parsers\Parsers.csproj" />
   </ItemGroup>
 
 </Project>

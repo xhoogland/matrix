@@ -3,6 +3,7 @@ using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Matrix.Parsers.LocationParsers
@@ -16,14 +17,19 @@ namespace Matrix.Parsers.LocationParsers
             var xmlDocument = new XmlDocument();
             var xmlFile = File.ReadAllText("LocatietabelDRIPS.xml");
             xmlDocument.LoadXml(xmlFile);
-            xmlFile = null;
-            var xmlContent = xmlDocument.GetElementsByTagName("SOAP:Envelope")[0].InnerXml;
+            var xmlContent = xmlDocument.InnerXml;
             xmlDocument.LoadXml(xmlContent);
-            var xmlAsJsonContent = JsonConvert.SerializeXmlNode(xmlDocument).Replace("SOAP:", "SOAP");
-            xmlAsJsonContent = xmlAsJsonContent.Replace("#text", "value");
-            xmlAsJsonContent = xmlAsJsonContent.Replace("@id", "id");
+            var xmlAsJsonContent = JsonConvert.SerializeXmlNode(xmlDocument);
+
+            var colonRegex = new Regex("([a-zA-Z]):([a-zA-Z])");
+            xmlAsJsonContent = colonRegex.Replace(xmlAsJsonContent, "$1$2");
+            var atSignRegex = new Regex("\"@([a-z])");
+            xmlAsJsonContent = atSignRegex.Replace(xmlAsJsonContent, "\"$1");
+            var hashRegex = new Regex("\"#([a-z])");
+            xmlAsJsonContent = hashRegex.Replace(xmlAsJsonContent, "\"$1");
+
             var data = JsonConvert.DeserializeObject<VariableMessageSignLocations>(xmlAsJsonContent);
-            Locations = data.SOAPBody.D2LogicalModel.PayloadPublication.VmsUnitTable.VmsUnitRecord;
+            Locations = data.SoapEnvelope.SoapBody.D2LogicalModel.PayloadPublication.VmsUnitTable.VmsUnitRecord;
         }
     }
 }

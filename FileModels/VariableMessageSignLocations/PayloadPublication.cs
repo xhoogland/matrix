@@ -4,6 +4,10 @@ namespace Matrix.FileModels.VariableMessageSignLocations
 {
     public class PayloadPublication
     {
+        public string XmlnsXi { get; set; }
+
+        public string XsiType { get; set; }
+
         public DateTime PublicationTime { get; set; }
 
         public PublicationCreator PublicationCreator { get; set; }

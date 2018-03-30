@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Reflection;
 
 namespace Matrix.Parsers
 {
-    class ParserHelper
+    public class ParserHelper
     {
         public static IConfigurationSection GetLvmsConfig()
         {
@@ -11,6 +12,12 @@ namespace Matrix.Parsers
                              .SetBasePath(Environment.CurrentDirectory)
                              .AddJsonFile("appsettings.json", true, true);
             return confBuilder.Build().GetSection("Lvms");
+        }
+
+        public static string GetAssemblyName()
+        {
+            var type = MethodBase.GetCurrentMethod().DeclaringType;
+            return Assembly.GetAssembly(type).FullName;
         }
     }
 }
