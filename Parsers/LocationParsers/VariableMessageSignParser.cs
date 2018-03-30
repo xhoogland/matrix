@@ -1,17 +1,13 @@
-﻿using Matrix.FileModels;
-using Matrix.FileModels.VariableMessageSignLocations;
+﻿using Matrix.FileModels.VariableMessageSignLocations;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    class VariableMessageSignParser : LocationParser
+    public class VariableMessageSignParser : LocationParser
     {
         public IEnumerable<Location> Locations { get; }
 
@@ -19,8 +15,6 @@ namespace Matrix.Parsers.LocationParsers
         {
             var xmlDocument = new XmlDocument();
             var xmlFile = File.ReadAllText("LocatietabelDRIPS.xml");
-            //var xmlNamespace = "http://datex2.eu/schema/2/2_0";
-            //var xmlContent = xmlFile.Descendants(XName.Get("d2LogicalModel", xmlNamespace)).Descendants(XName.Get("payloadPublication", xmlNamespace)).Descendants(XName.Get("vmsUnitTable", xmlNamespace)).First().ToString();
             xmlDocument.LoadXml(xmlFile);
             xmlFile = null;
             var xmlContent = xmlDocument.GetElementsByTagName("SOAP:Envelope")[0].InnerXml;

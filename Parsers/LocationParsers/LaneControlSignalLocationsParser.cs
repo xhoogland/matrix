@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    class LaneControlSignalLocationsParser : LocationParser
+    public class LaneControlSignalLocationsParser : LocationParser
     {
         public IEnumerable<Location> Locations { get; }
 

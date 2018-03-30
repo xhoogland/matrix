@@ -1,6 +1,8 @@
 ﻿using Matrix.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace LocationsGenerator
 {
@@ -9,10 +11,22 @@ namespace LocationsGenerator
         static void Main(string[] args)
         {
             var interfaceImplemented = typeof(LocationParser);
-            var parsers = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes())
-                          .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(t => Activator.CreateInstance(t)).ToList();
-            
+            //var a = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
+            var assemblyTypes = AppDomain.CurrentDomain.GetAssemblies().Select(a => a);
+            var parsers = new List<LocationParser>();
+            foreach (object assemblyType in assemblyTypes)
+            {
+                var o = assemblyType as LocationParser;
+                if (o != null)
+                {
+                    parsers.Add(o);
+                }
+            }
+
+            //var classes = assemblies
+            //    .Where(t => interfaceImplemented.IsAssignableFrom(t));// && !t.IsAbstract && !t.IsInterface);
+           // var parsers = classes.Select(Activator.CreateInstance).ToList();
+
             foreach (LocationParser parser in parsers)
             {
                 foreach (Location location in parser.Locations)

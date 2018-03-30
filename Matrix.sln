@@ -11,9 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsers", "Parsers\Parsers.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileModels", "FileModels\FileModels.csproj", "{CD87CF93-0F06-44E7-8D99-F4BC11B5684D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{41A4B017-0491-41A6-B367-352BA96E7756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interfaces", "Interfaces\Interfaces.csproj", "{41A4B017-0491-41A6-B367-352BA96E7756}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecificImplementations", "SpecificImplementations\SpecificImplementations.csproj", "{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecificImplementations", "SpecificImplementations\SpecificImplementations.csproj", "{5B1650F8-14BB-43C5-B146-6ABB3621A5D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0127AF03-A193-435E-BBF8-427CA29C3F88}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
