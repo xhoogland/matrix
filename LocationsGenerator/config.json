@@ -1,0 +1,6 @@
+﻿{
+  "FileLocation": {
+    "VariableMessageSignParser": "Import/LocatietabelDRIPS.xml",
+    "LaneControlSignalLocationsParser": "Import/matrixLocaties.json"
+  }
+}

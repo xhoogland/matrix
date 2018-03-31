@@ -31,5 +31,7 @@ namespace Matrix.FileModels.LaneControlSignalLocations
         public string RoadSide => Properties.Carriagew0;
 
         public string Id => Properties.Uuid;
+
+        public bool IsLaneSpecific => true;
     }
 }

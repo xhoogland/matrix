@@ -10,11 +10,16 @@ namespace Matrix.Parsers.LocationParsers
     {
         public IEnumerable<Location> Locations { get; }
 
-        public LaneControlSignalLocationsParser()
+        public LaneControlSignalLocationsParser(string fileLocation)
         {
-            var jsonContent = File.ReadAllText("matrixLocaties.json");
-            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(jsonContent);
-            Locations = data.Features;
+            var jsonContent = File.ReadAllText(fileLocation);
+            Locations = GetLocationsByFileContent(jsonContent);
+        }
+
+        public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
+        {
+            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(fileContent);
+            return data.Features;
         }
     }
 }

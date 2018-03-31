@@ -9,6 +9,11 @@ namespace Matrix.ViewModels
 
         public string Country { get; set; }
 
-        public IEnumerable<RoadWay> RoadWays { get; set; }
+        public IList<RoadWay> RoadWays { get; set; }
+
+        public VariableMessageSignPortal()
+        {
+            RoadWays = new List<RoadWay>();
+        }
     }
 }

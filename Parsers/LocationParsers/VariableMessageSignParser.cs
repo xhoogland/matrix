@@ -12,11 +12,18 @@ namespace Matrix.Parsers.LocationParsers
     {
         public IEnumerable<Location> Locations { get; }
 
-        public VariableMessageSignParser()
+        public VariableMessageSignParser(string fileLocation)
+        {
+            ParserHelper.ExtractGzToFile("LocatietabelDRIPS.xml.gz", fileLocation);
+            var xmlFile = File.ReadAllText(fileLocation);
+
+            Locations = GetLocationsByFileContent(xmlFile);
+        }
+
+        public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
         {
             var xmlDocument = new XmlDocument();
-            var xmlFile = File.ReadAllText("LocatietabelDRIPS.xml");
-            xmlDocument.LoadXml(xmlFile);
+            xmlDocument.LoadXml(fileContent);
             var xmlContent = xmlDocument.InnerXml;
             xmlDocument.LoadXml(xmlContent);
             var xmlAsJsonContent = JsonConvert.SerializeXmlNode(xmlDocument);
@@ -29,7 +36,7 @@ namespace Matrix.Parsers.LocationParsers
             xmlAsJsonContent = hashRegex.Replace(xmlAsJsonContent, "\"$1");
 
             var data = JsonConvert.DeserializeObject<VariableMessageSignLocations>(xmlAsJsonContent);
-            Locations = data.SoapEnvelope.SoapBody.D2LogicalModel.PayloadPublication.VmsUnitTable.VmsUnitRecord;
+            return data.SoapEnvelope.SoapBody.D2LogicalModel.PayloadPublication.VmsUnitTable.VmsUnitRecord;
         }
     }
 }

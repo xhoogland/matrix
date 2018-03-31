@@ -6,6 +6,11 @@ namespace Matrix.ViewModels
     {
         public string HmLocation { get; set; }
 
-        public IEnumerable<VariableMessageSign> VariableMessageSigns { get; set; }
+        public IList<VariableMessageSign> VariableMessageSigns { get; set; }
+
+        public RoadWay()
+        {
+            VariableMessageSigns = new List<VariableMessageSign>();
+        }
     }
 }

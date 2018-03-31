@@ -15,5 +15,7 @@
         int? Lane { get; }
 
         bool HasCoordinates { get; }
+
+        bool IsLaneSpecific { get; }
     }
 }

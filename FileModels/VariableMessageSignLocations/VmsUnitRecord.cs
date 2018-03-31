@@ -31,5 +31,7 @@ namespace Matrix.FileModels.VariableMessageSignLocations
         public string Id { get; set; }
 
         public int? Lane => null;
+
+        public bool IsLaneSpecific => false;
     }
 }
