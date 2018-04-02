@@ -1,6 +1,7 @@
 ﻿{
   "FileLocation": {
-    "VariableMessageSignParser": "Import/LocatietabelDRIPS.xml",
-    "LaneControlSignalLocationsParser": "Import/matrixLocaties.json"
+    "VariableMessageSignParser": "LocatietabelDRIPS.xml.gz",
+    "LaneControlSignalLocationsParser": "NDW_MRM_MSI_Shapes_Januari_2018.zip",
+    "A1ReversibleLaneLaneControlSignalLocationsParser": "a1ReversibleLane.json"
   }
 }

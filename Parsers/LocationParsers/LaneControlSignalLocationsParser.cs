@@ -1,8 +1,11 @@
-﻿using Matrix.FileModels.LaneControlSignalLocations;
+﻿using Harlow;
+using Matrix.FileModels.LaneControlSignalLocations;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 
 namespace Matrix.Parsers.LocationParsers
 {
@@ -12,14 +15,44 @@ namespace Matrix.Parsers.LocationParsers
 
         public LaneControlSignalLocationsParser(string fileLocation)
         {
-            var jsonContent = File.ReadAllText(fileLocation);
+            var fileLocationSplit = fileLocation.Split('\\');
+            var extractDir = fileLocationSplit[0];
+            ZipFile.ExtractToDirectory(fileLocation, extractDir, true);
+            var shapeFileDirectory = Path.Combine(extractDir, "MSI");
+            var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
+            var shape = new ShapeFileReader(shapeFileLocation);
+
+            var jsonContent = shape.FeaturesAsJson().Replace("\\u0000", string.Empty);
+            jsonContent = MapJsonToCorrectFormat(jsonContent);
             Locations = GetLocationsByFileContent(jsonContent);
+        }
+
+        private string MapJsonToCorrectFormat(string jsonContent)
+        {
+            var harlowFeatures = JsonConvert.DeserializeObject<IEnumerable<HarlowFeature>>(jsonContent);
+            var features = new List<Feature>();
+            foreach (var harlowFeature in harlowFeatures)
+            {
+                var feature = new Feature
+                {
+                    Geometry = new Geometry
+                    {
+                        Coordinates = harlowFeature.Coordinates
+                    },
+                    Properties = harlowFeature.Properties,
+                    Type = harlowFeature.Type
+                };
+
+                features.Add(feature);
+            }
+
+            return JsonConvert.SerializeObject(features);
         }
 
         public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
         {
-            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(fileContent);
-            return data.Features;
+            var data = JsonConvert.DeserializeObject<IEnumerable<Feature>>(fileContent);
+            return data;
         }
     }
 }

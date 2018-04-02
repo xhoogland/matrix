@@ -14,8 +14,9 @@ namespace Matrix.Parsers.LocationParsers
 
         public VariableMessageSignParser(string fileLocation)
         {
-            ParserHelper.ExtractGzToFile("LocatietabelDRIPS.xml.gz", fileLocation);
-            var xmlFile = File.ReadAllText(fileLocation);
+            var destinationFile = string.Format("{0}.{1}", fileLocation, "txt");
+            ParserHelper.ExtractGzToFile(fileLocation, destinationFile);
+            var xmlFile = File.ReadAllText(destinationFile);
 
             Locations = GetLocationsByFileContent(xmlFile);
         }
@@ -24,8 +25,6 @@ namespace Matrix.Parsers.LocationParsers
         {
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(fileContent);
-            var xmlContent = xmlDocument.InnerXml;
-            xmlDocument.LoadXml(xmlContent);
             var xmlAsJsonContent = JsonConvert.SerializeXmlNode(xmlDocument);
 
             var colonRegex = new Regex("([a-zA-Z]):([a-zA-Z])");

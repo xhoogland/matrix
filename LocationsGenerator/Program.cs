@@ -30,7 +30,7 @@ namespace Matrix.LocationsGenerator
             var interfaceImplemented = typeof(LocationParser);
             var parsers = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == parsersName).SelectMany(a => a.GetTypes())
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(t => Activator.CreateInstance(t, fileLocation.GetType().GetProperties().Where(tt => t.ToString().Contains(tt.Name)).First().GetValue(fileLocation))).ToList();
+                          .Select(t => Activator.CreateInstance(t, Path.Combine("Import", fileLocation.GetType().GetProperties().Where(tt => t.ToString().Contains(string.Format(".{0}", tt.Name))).First().GetValue(fileLocation).ToString()))).ToList();
 
             var portals = new List<VariableMessageSignPortal>();
             foreach (LocationParser parser in parsers)
@@ -97,7 +97,7 @@ namespace Matrix.LocationsGenerator
             };
             var json = JsonConvert.SerializeObject(portals, settings);
 
-            File.WriteAllText("VariableMessageSignPortalLocations.js", json);
+            File.WriteAllText("variableMessageSignPortalLocations.json", json);
         }
     }
 }
