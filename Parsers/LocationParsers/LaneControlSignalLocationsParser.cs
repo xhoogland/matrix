@@ -15,10 +15,9 @@ namespace Matrix.Parsers.LocationParsers
 
         public LaneControlSignalLocationsParser(string fileLocation)
         {
-            var fileLocationSplit = fileLocation.Split('\\');
-            var extractDir = Path.Combine(fileLocationSplit[0], "NDW_MRM_MSI_Shapes");
-            ZipFile.ExtractToDirectory(fileLocation, extractDir, true);
-            var shapeFileDirectory = Path.Combine(extractDir, "MSI");
+            var fileLocationSplit = fileLocation.Split(Path.DirectorySeparatorChar);
+            ZipFile.ExtractToDirectory(fileLocation, fileLocationSplit[0], true);
+            var shapeFileDirectory = Path.Combine(fileLocationSplit[0], "MSI");
             var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
             var shape = new ShapeFileReader(shapeFileLocation);
 

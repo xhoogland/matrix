@@ -14,12 +14,6 @@ namespace Matrix.LocationsGenerator
     {
         static void Main(string[] args)
         {
-#if DEBUG
-            var dirName = "Import";
-            if (!Directory.Exists(dirName))
-                Directory.CreateDirectory(dirName);
-#endif
-
             var config = File.ReadAllText("config.json");
             var fileLocation = JsonConvert.DeserializeObject<Config>(config).FileLocation;
 
