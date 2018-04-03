@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Matrix.LocationsGenerator
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var config = File.ReadAllText("config.json");
             var fileLocation = JsonConvert.DeserializeObject<Config>(config).FileLocation;
@@ -24,12 +24,12 @@ namespace Matrix.LocationsGenerator
             var interfaceImplemented = typeof(LocationParser);
             var parsers = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == parsersName).SelectMany(a => a.GetTypes())
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(t => Activator.CreateInstance(t, Path.Combine("Import", fileLocation.GetType().GetProperties().Where(tt => t.ToString().Contains(string.Format(".{0}", tt.Name))).First().GetValue(fileLocation).ToString()))).ToList();
+                          .Select(t => Activator.CreateInstance(t, Path.Combine("Import", fileLocation.GetType().GetProperties().First(tt => t.ToString().Contains(string.Format(".{0}", tt.Name))).GetValue(fileLocation).ToString()))).ToList();
 
             var portals = new List<VariableMessageSignPortal>();
             foreach (LocationParser parser in parsers)
             {
-                foreach (Location location in parser.Locations.OrderBy(l => l.Lane))
+                foreach (var location in parser.Locations.OrderBy(l => l.Lane))
                 {
                     if (!location.HasCoordinates)
                         continue;

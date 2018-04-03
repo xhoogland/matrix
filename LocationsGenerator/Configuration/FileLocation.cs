@@ -1,6 +1,6 @@
 ﻿namespace Matrix.LocationsGenerator.Configuration
 {
-    class FileLocation
+    internal class FileLocation
     {
         public string VariableMessageSignParser { get; set; }
 
