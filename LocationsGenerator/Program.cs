@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Matrix.LocationsGenerator
 {
@@ -24,7 +25,7 @@ namespace Matrix.LocationsGenerator
             var interfaceImplemented = typeof(LocationParser);
             var parsers = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == parsersName).SelectMany(a => a.GetTypes())
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(t => Activator.CreateInstance(t, Path.Combine("Import", fileLocation.GetType().GetProperties().First(tt => t.ToString().Contains(string.Format(".{0}", tt.Name))).GetValue(fileLocation).ToString()))).ToList();
+                          .Select(t => CreateObjectInstance(t, fileLocation)).ToList();
 
             var portals = new List<VariableMessageSignPortal>();
             foreach (LocationParser parser in parsers)
@@ -46,42 +47,7 @@ namespace Matrix.LocationsGenerator
                     var id = location.Id;
                     var hmLocation = string.Format("{0} {1} {2}", roadName, roadSide, km).Trim();
 
-                    VariableMessageSign vms;
-                    if (isLaneSpecific)
-                        vms = new LaneControlSignal
-                        {
-                            Id = id,
-                            Number = lane.Value
-                            
-                        };
-                    else
-                        vms = new VariableMessageSign
-                        {
-                            Id = id
-                        };
-
-                    var portal = portals.FirstOrDefault(p => p.Coordinates.AreCoordinatesInRange(coordinates) && isLaneSpecific);
-                    if (portal == null)
-                    {
-                        portal = new VariableMessageSignPortal
-                        {
-                            Coordinates = coordinates,
-                            Country = "NL"
-                        };
-                        portals.Add(portal);
-                    }
-
-                    var roadWay = portal.RoadWays.FirstOrDefault(r => r.HmLocation == hmLocation);
-                    if (roadWay == null)
-                    {
-                        roadWay = new RoadWay
-                        {
-                            HmLocation = hmLocation
-                        };
-                        portal.RoadWays.Add(roadWay);
-                    }
-
-                    roadWay.VariableMessageSigns.Add(vms);
+                    AddVmsToPortal(portals, isLaneSpecific, lane, coordinates, id, hmLocation);
                 }
             }
 
@@ -92,6 +58,57 @@ namespace Matrix.LocationsGenerator
             var json = JsonConvert.SerializeObject(portals, settings);
 
             File.WriteAllText("variableMessageSignPortalLocations.json", json);
+        }
+
+        private static void AddVmsToPortal(List<VariableMessageSignPortal> portals, bool isLaneSpecific, int? lane, Coordinates coordinates, string id, string hmLocation)
+        {
+            VariableMessageSign vms;
+            if (isLaneSpecific)
+                vms = new LaneControlSignal
+                {
+                    Id = id,
+                    Number = lane.Value
+
+                };
+            else
+                vms = new VariableMessageSign
+                {
+                    Id = id
+                };
+
+            var portal = portals.FirstOrDefault(p => p.Coordinates.AreCoordinatesInRange(coordinates) && isLaneSpecific);
+            if (portal == null)
+            {
+                portal = new VariableMessageSignPortal
+                {
+                    Coordinates = coordinates,
+                    Country = "NL"
+                };
+                portals.Add(portal);
+            }
+
+            var roadWay = portal.RoadWays.FirstOrDefault(r => r.HmLocation == hmLocation);
+            if (roadWay == null)
+            {
+                roadWay = new RoadWay
+                {
+                    HmLocation = hmLocation
+                };
+                portal.RoadWays.Add(roadWay);
+            }
+
+            roadWay.VariableMessageSigns.Add(vms);
+        }
+
+        private static object CreateObjectInstance(Type type, FileLocation fileLocation)
+        {
+            var flProperties = fileLocation.GetType().GetProperties();
+            bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
+            var property = flProperties.First(p => getPropertyByType(type, p));
+            var filePath = Path.Combine("Import", property.GetValue(fileLocation).ToString());
+
+            var objectInstance = Activator.CreateInstance(type, filePath);
+            return objectInstance;
         }
     }
 }
