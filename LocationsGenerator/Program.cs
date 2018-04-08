@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Matrix.LocationsGenerator
 {
@@ -27,29 +28,7 @@ namespace Matrix.LocationsGenerator
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
                           .Select(t => CreateObjectInstance(t, fileLocation)).ToList();
 
-            var portals = new List<VariableMessageSignPortal>();
-            foreach (LocationParser parser in parsers)
-            {
-                foreach (var location in parser.Locations.OrderBy(l => l.Lane))
-                {
-                    if (!location.HasCoordinates)
-                        continue;
-
-                    var isLaneSpecific = location.IsLaneSpecific;
-                    var lane = location.Lane;
-                    if (isLaneSpecific && !lane.HasValue)
-                        continue;
-
-                    var km = location.Km;
-                    var coordinates = location.Coordinates;
-                    var roadName = location.RoadName;
-                    var roadSide = location.RoadSide;
-                    var id = location.Id;
-                    var hmLocation = string.Format("{0} {1} {2}", roadName, roadSide, km).Trim();
-
-                    AddVmsToPortal(portals, isLaneSpecific, lane, coordinates, id, hmLocation);
-                }
-            }
+            var portals = FillPortals(parsers);
 
             var settings = new JsonSerializerSettings
             {
@@ -58,6 +37,45 @@ namespace Matrix.LocationsGenerator
             var json = JsonConvert.SerializeObject(portals, settings);
 
             File.WriteAllText("variableMessageSignPortalLocations.json", json);
+        }
+
+        private static List<VariableMessageSignPortal> FillPortals(List<LocationParser> locationParsers)
+        {
+            return FillPortalsAsync(locationParsers).Result;
+        }
+
+        private static async Task<List<VariableMessageSignPortal>> FillPortalsAsync(List<LocationParser> locationParsers)
+        {
+            var retrieveLocationsTasks = new List<Task<IEnumerable<Location>>>();
+            foreach (var locationParser in locationParsers)
+            {
+                retrieveLocationsTasks.Add(locationParser.RetrieveLocationsFromContent());
+            }
+
+            var locationsWhenAll = await Task.WhenAll(retrieveLocationsTasks);
+            var locations = locationsWhenAll.SelectMany(result => result);
+            var portals = new List<VariableMessageSignPortal>();
+            foreach (var location in locations.OrderBy(l => l.Lane))
+            {
+                if (!location.HasCoordinates)
+                    continue;
+
+                var isLaneSpecific = location.IsLaneSpecific;
+                var lane = location.Lane;
+                if (isLaneSpecific && !lane.HasValue)
+                    continue;
+
+                var km = location.Km;
+                var coordinates = location.Coordinates;
+                var roadName = location.RoadName;
+                var roadSide = location.RoadSide;
+                var id = location.Id;
+                var hmLocation = string.Format("{0} {1} {2}", roadName, roadSide, km).Trim();
+
+                AddVmsToPortal(portals, isLaneSpecific, lane, coordinates, id, hmLocation);
+            }
+
+            return portals;
         }
 
         private static void AddVmsToPortal(List<VariableMessageSignPortal> portals, bool isLaneSpecific, int? lane, Coordinates coordinates, string id, string hmLocation)
@@ -100,7 +118,7 @@ namespace Matrix.LocationsGenerator
             roadWay.VariableMessageSigns.Add(vms);
         }
 
-        private static object CreateObjectInstance(Type type, FileLocation fileLocation)
+        private static LocationParser CreateObjectInstance(Type type, FileLocation fileLocation)
         {
             var flProperties = fileLocation.GetType().GetProperties();
             bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
@@ -108,7 +126,7 @@ namespace Matrix.LocationsGenerator
             var filePath = Path.Combine("Import", property.GetValue(fileLocation).ToString());
 
             var objectInstance = Activator.CreateInstance(type, filePath);
-            return objectInstance;
+            return (LocationParser)objectInstance;
         }
     }
 }

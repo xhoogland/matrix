@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Matrix.Interfaces
 {
     public interface LocationParser
     {
-        IEnumerable<Location> Locations { get; }
-
-        IEnumerable<Location> GetLocationsByFileContent(string fileContent);
+        Task<IEnumerable<Location>> RetrieveLocationsFromContent();
     }
 }

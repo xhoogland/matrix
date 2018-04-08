@@ -6,24 +6,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
 {
     public class LaneControlSignalLocationsParser : LocationParser
     {
-        public IEnumerable<Location> Locations { get; }
+        private string _fileLocation;
 
         public LaneControlSignalLocationsParser(string fileLocation)
         {
-            var fileLocationSplit = fileLocation.Split(Path.DirectorySeparatorChar);
-            ZipFile.ExtractToDirectory(fileLocation, fileLocationSplit[0], true);
-            var shapeFileDirectory = Path.Combine(fileLocationSplit[0], "MSI");
-            var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
-            var shape = new ShapeFileReader(shapeFileLocation);
-
-            var jsonContent = shape.FeaturesAsJson().Replace("\\u0000", string.Empty);
-            jsonContent = MapJsonToCorrectFormat(jsonContent);
-            Locations = GetLocationsByFileContent(jsonContent);
+            _fileLocation = fileLocation;
         }
 
         private string MapJsonToCorrectFormat(string jsonContent)
@@ -48,9 +41,19 @@ namespace Matrix.Parsers.LocationParsers
             return JsonConvert.SerializeObject(features);
         }
 
-        public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
-            var data = JsonConvert.DeserializeObject<IEnumerable<Feature>>(fileContent);
+            var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
+            ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true);
+            var shapeFileDirectory = Path.Combine(fileLocationSplit[0], "MSI");
+            var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
+            var shape = new ShapeFileReader(shapeFileLocation);
+
+            var featuresAsJson = await Task.Run(() => shape.FeaturesAsJson());
+            var jsonContent = featuresAsJson.Replace("\\u0000", string.Empty);
+            jsonContent = MapJsonToCorrectFormat(jsonContent);
+
+            var data = JsonConvert.DeserializeObject<IEnumerable<Feature>>(jsonContent);
             return data;
         }
     }

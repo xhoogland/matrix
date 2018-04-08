@@ -3,22 +3,23 @@ using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
 {
     public class A1ReversibleLaneLaneControlSignalLocationsParser : LocationParser
     {
-        public IEnumerable<Location> Locations { get; }
+        private string _fileLocation;
 
         public A1ReversibleLaneLaneControlSignalLocationsParser(string fileLocation)
         {
-            var jsonContent = File.ReadAllText(fileLocation);
-            Locations = GetLocationsByFileContent(jsonContent);
+            _fileLocation = fileLocation;
         }
 
-        public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
-            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(fileContent);
+            var jsonContent = await File.ReadAllTextAsync(_fileLocation);
+            var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(jsonContent);
             return data.Features;
         }
     }

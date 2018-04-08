@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Matrix.Parsers
 {
@@ -12,7 +13,7 @@ namespace Matrix.Parsers
             return Assembly.GetAssembly(type).FullName;
         }
 
-        public static void ExtractGzToFile(string gzFile, string outputFile)
+        public async static Task ExtractGzToFile(string gzFile, string outputFile)
         {
             var gzipFileName = new FileInfo(gzFile);
             using (var fileToDecompressAsStream = gzipFileName.OpenRead())
@@ -21,7 +22,7 @@ namespace Matrix.Parsers
                 {
                     using (var decompressionStream = new GZipStream(fileToDecompressAsStream, CompressionMode.Decompress))
                     {
-                        decompressionStream.CopyTo(decompressedStream);
+                        await decompressionStream.CopyToAsync(decompressedStream);
                     }
                 }
             }

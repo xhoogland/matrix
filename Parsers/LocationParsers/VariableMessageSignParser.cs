@@ -4,27 +4,28 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Matrix.Parsers.LocationParsers
 {
     public class VariableMessageSignParser : LocationParser
     {
-        public IEnumerable<Location> Locations { get; }
+        private string _fileLocation;
 
         public VariableMessageSignParser(string fileLocation)
         {
-            var destinationFile = string.Format("{0}.{1}", fileLocation, "txt");
-            ParserHelper.ExtractGzToFile(fileLocation, destinationFile);
-            var xmlFile = File.ReadAllText(destinationFile);
-
-            Locations = GetLocationsByFileContent(xmlFile);
+            _fileLocation = fileLocation;
         }
 
-        public IEnumerable<Location> GetLocationsByFileContent(string fileContent)
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
+            var destinationFile = string.Format("{0}.{1}", _fileLocation, "txt");
+            await ParserHelper.ExtractGzToFile(_fileLocation, destinationFile);
+            var xmlFile = await File.ReadAllTextAsync(destinationFile);
+
             var xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(fileContent);
+            xmlDocument.LoadXml(xmlFile);
             var xmlAsJsonContent = JsonConvert.SerializeXmlNode(xmlDocument);
 
             var colonRegex = new Regex("([a-zA-Z]):([a-zA-Z])");
