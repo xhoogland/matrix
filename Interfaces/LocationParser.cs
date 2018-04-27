@@ -6,5 +6,7 @@ namespace Matrix.Interfaces
     public interface LocationParser
     {
         Task<IEnumerable<Location>> RetrieveLocationsFromContent();
+
+        Task DownloadImportableFile();
     }
 }

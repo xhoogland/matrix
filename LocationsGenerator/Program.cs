@@ -16,8 +16,8 @@ namespace Matrix.LocationsGenerator
     {
         private static void Main(string[] args)
         {
-            var config = File.ReadAllText("config.json");
-            var fileLocation = JsonConvert.DeserializeObject<Config>(config).FileLocation;
+            var configFile = File.ReadAllText("config.json");
+            var config = JsonConvert.DeserializeObject<Config>(configFile);
 
             // By calling something from the Parsers-dll, we ensure having it - and
             // used types - available in the list returned by GetAssemblies.
@@ -26,9 +26,11 @@ namespace Matrix.LocationsGenerator
             var interfaceImplemented = typeof(LocationParser);
             var parsers = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == parsersName).SelectMany(a => a.GetTypes())
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(t => CreateObjectInstance(t, fileLocation)).ToList();
+                          .Select(t => CreateObjectInstance(t, config)).ToList();
 
-            var portals = FillPortals(parsers);
+            DownloadDataForImport(parsers).Wait();
+
+            var portals = FillPortalsAsync(parsers).Result;
 
             var settings = new JsonSerializerSettings
             {
@@ -39,9 +41,15 @@ namespace Matrix.LocationsGenerator
             File.WriteAllText("variableMessageSignPortalLocations.json", json);
         }
 
-        private static List<VariableMessageSignPortal> FillPortals(List<LocationParser> locationParsers)
+        private static async Task DownloadDataForImport(List<LocationParser> locationParsers)
         {
-            return FillPortalsAsync(locationParsers).Result;
+            var downloadTasks = new List<Task>();
+            foreach (var locationParser in locationParsers)
+            {
+                downloadTasks.Add(locationParser.DownloadImportableFile());
+            }
+
+            await Task.WhenAll(downloadTasks);
         }
 
         private static async Task<List<VariableMessageSignPortal>> FillPortalsAsync(List<LocationParser> locationParsers)
@@ -118,14 +126,17 @@ namespace Matrix.LocationsGenerator
             roadWay.VariableMessageSigns.Add(vms);
         }
 
-        private static LocationParser CreateObjectInstance(Type type, FileLocation fileLocation)
+        private static LocationParser CreateObjectInstance(Type type, Config config)
         {
-            var flProperties = fileLocation.GetType().GetProperties();
+            var flProperties = config.FileLocation.GetType().GetProperties();
+            var dlProperties = config.DownloadLocation.GetType().GetProperties();
             bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
-            var property = flProperties.First(p => getPropertyByType(type, p));
-            var filePath = Path.Combine("Import", property.GetValue(fileLocation).ToString());
+            var flProperty = flProperties.First(p => getPropertyByType(type, p));
+            var dlProperty = flProperties.First(p => getPropertyByType(type, p));
+            var filePath = Path.Combine("Import", flProperty.GetValue(config.FileLocation).ToString());
+            var downloadUrl = flProperty.GetValue(config.DownloadLocation).ToString();
 
-            var objectInstance = Activator.CreateInstance(type, filePath);
+            var objectInstance = Activator.CreateInstance(type, filePath, downloadUrl);
             return (LocationParser)objectInstance;
         }
     }

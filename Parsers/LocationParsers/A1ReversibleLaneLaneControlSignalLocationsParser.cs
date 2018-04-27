@@ -11,9 +11,18 @@ namespace Matrix.Parsers.LocationParsers
     {
         private string _fileLocation;
 
-        public A1ReversibleLaneLaneControlSignalLocationsParser(string fileLocation)
+        private string _downloadLocation;
+
+        public A1ReversibleLaneLaneControlSignalLocationsParser(string fileLocation, string downloadLocation)
         {
             _fileLocation = fileLocation;
+            _downloadLocation = downloadLocation;
+        }
+
+        public async Task DownloadImportableFile()
+        {
+            var file = ParserHelper.DownloadFile(_downloadLocation);
+            await File.WriteAllTextAsync(_fileLocation, file);
         }
 
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()

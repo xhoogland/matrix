@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
@@ -14,9 +15,12 @@ namespace Matrix.Parsers.LocationParsers
     {
         private string _fileLocation;
 
-        public LaneControlSignalLocationsParser(string fileLocation)
+        private string _downloadLocation;
+
+        public LaneControlSignalLocationsParser(string fileLocation, string downloadLocation)
         {
             _fileLocation = fileLocation;
+            _downloadLocation = downloadLocation;
         }
 
         private string MapJsonToCorrectFormat(string jsonContent)
@@ -55,6 +59,15 @@ namespace Matrix.Parsers.LocationParsers
 
             var data = JsonConvert.DeserializeObject<IEnumerable<Feature>>(jsonContent);
             return data;
+        }
+
+        public async Task DownloadImportableFile()
+        {
+            if (_downloadLocation == null)
+                return;
+
+            var file = ParserHelper.DownloadFile(_downloadLocation);
+            await File.WriteAllTextAsync(_fileLocation, file);
         }
     }
 }

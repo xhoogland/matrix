@@ -13,9 +13,18 @@ namespace Matrix.Parsers.LocationParsers
     {
         private string _fileLocation;
 
-        public VariableMessageSignParser(string fileLocation)
+        private string _downloadLocation;
+
+        public VariableMessageSignParser(string fileLocation, string downloadLocation)
         {
             _fileLocation = fileLocation;
+            _downloadLocation = downloadLocation;
+        }
+
+        public async Task DownloadImportableFile()
+        {
+            var file = ParserHelper.DownloadFile(_downloadLocation);
+            await File.WriteAllTextAsync(_fileLocation, file);
         }
 
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
