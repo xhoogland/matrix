@@ -3,6 +3,7 @@ using Matrix.LocationsGenerator.Configuration;
 using Matrix.Parsers;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,9 +17,13 @@ namespace Matrix.LocationsGenerator
     {
         private static void Main(string[] args)
         {
-            var configFile = File.ReadAllText("config.json");
-            var config = JsonConvert.DeserializeObject<Config>(configFile);
-
+            var configFile = JObject.Parse(File.ReadAllText("config.json"));
+            var configPrivateFile = JObject.Parse(File.ReadAllText("config.private.json"));
+            configFile.Merge(configPrivateFile, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            });
+            var config = JsonConvert.DeserializeObject<Config>(configFile.ToString());
             // By calling something from the Parsers-dll, we ensure having it - and
             // used types - available in the list returned by GetAssemblies.
             var parsersName = ParserHelper.GetAssemblyName();
