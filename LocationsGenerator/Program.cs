@@ -139,7 +139,9 @@ namespace Matrix.LocationsGenerator
             var flProperty = flProperties.First(p => getPropertyByType(type, p));
             var dlProperty = flProperties.First(p => getPropertyByType(type, p));
             var filePath = Path.Combine("Import", flProperty.GetValue(config.FileLocation).ToString());
-            var downloadUrl = flProperty.GetValue(config.DownloadLocation).ToString();
+            var downloadUrl = flProperty.GetValue(config.DownloadLocation);
+            if (downloadUrl != null)
+                downloadUrl = downloadUrl.ToString();
 
             var objectInstance = Activator.CreateInstance(type, filePath, downloadUrl);
             return (LocationParser)objectInstance;
