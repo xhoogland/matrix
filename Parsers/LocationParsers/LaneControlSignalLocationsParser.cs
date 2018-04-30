@@ -49,7 +49,8 @@ namespace Matrix.Parsers.LocationParsers
         {
             var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
             ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true);
-            var shapeFileDirectory = Path.Combine(fileLocationSplit[0], "MSI");
+            var extractFolderName = fileLocationSplit[1].Replace(".zip", string.Empty);
+            var shapeFileDirectory = Path.Combine(fileLocationSplit[0], extractFolderName, "MSI");
             var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
             var shape = new ShapeFileReader(shapeFileLocation);
 
