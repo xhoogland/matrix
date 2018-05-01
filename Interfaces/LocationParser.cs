@@ -7,6 +7,6 @@ namespace Matrix.Interfaces
     {
         Task<IEnumerable<Location>> RetrieveLocationsFromContent();
 
-        Task DownloadImportableFile();
+        void DownloadImportableFile();
     }
 }

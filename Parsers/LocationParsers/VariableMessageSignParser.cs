@@ -21,10 +21,9 @@ namespace Matrix.Parsers.LocationParsers
             _downloadLocation = downloadLocation;
         }
 
-        public async Task DownloadImportableFile()
+        public void DownloadImportableFile()
         {
-            var file = ParserHelper.DownloadFile(_downloadLocation);
-            await File.WriteAllTextAsync(_fileLocation, file);
+            ParserHelper.DownloadFile(_downloadLocation, _fileLocation);
         }
 
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()

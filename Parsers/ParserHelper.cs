@@ -2,7 +2,6 @@
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -31,45 +30,12 @@ namespace Matrix.Parsers
             }
         }
 
-        public static string DownloadFile(string url)
+        public static void DownloadFile(string url, string savePath)
         {
-            //var fileContents = string.Empty;
-            //using (var webClient = new WebClient())
-            //{
-            //    var localFilePath = Path.GetTempFileName();
-            //    webClient.Headers.Add("Accept: text/html, application/xhtml+xml, */*");
-            //    webClient.Headers.Add("User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
-            //    webClient.DownloadFile(new Uri(url), localFilePath);
-            //    fileContents = await File.ReadAllTextAsync(localFilePath);
-            //}
-            //return fileContents;
-
-            //var webRequest = WebRequest.Create(url);
-            //var response = await webRequest.GetResponseAsync();
-            //var stream = response.GetResponseStream();
-            //var streamReader = new StreamReader(stream);
-            //return streamReader.ReadToEnd();
-
-            var fileContents = string.Empty;
             using (var webClient = new WebClient())
             {
-                var localFilePath = Path.GetTempFileName();
-                webClient.DownloadFile(new Uri(url), localFilePath);
-                fileContents = File.ReadAllText(localFilePath);
+                webClient.DownloadFile(new Uri(url), savePath);
             }
-            return fileContents;
-
-            //using (var httpClient = new HttpClient())
-            //{
-            //    using (var result = await httpClient.GetAsync(url))
-            //    {
-            //        if (result.IsSuccessStatusCode)
-            //        {
-            //            return await result.Content.ReadAsStringAsync();
-            //        }
-            //    }
-            //}
-            //return null;
         }
     }
 }

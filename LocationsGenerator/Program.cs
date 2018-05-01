@@ -33,7 +33,7 @@ namespace Matrix.LocationsGenerator
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
                           .Select(t => CreateObjectInstance(t, config)).ToList();
 
-            DownloadDataForImport(parsers).Wait();
+            DownloadDataForImport(parsers);
 
             var portals = FillPortalsAsync(parsers).Result;
 
@@ -46,15 +46,13 @@ namespace Matrix.LocationsGenerator
             File.WriteAllText("variableMessageSignPortalLocations.json", json);
         }
 
-        private static async Task DownloadDataForImport(List<LocationParser> locationParsers)
+        private static void DownloadDataForImport(List<LocationParser> locationParsers)
         {
-            var downloadTasks = new List<Task>();
+            Directory.CreateDirectory("Import");
             foreach (var locationParser in locationParsers)
             {
-                downloadTasks.Add(locationParser.DownloadImportableFile());
+                locationParser.DownloadImportableFile();
             }
-
-            await Task.WhenAll(downloadTasks);
         }
 
         private static async Task<List<VariableMessageSignPortal>> FillPortalsAsync(List<LocationParser> locationParsers)

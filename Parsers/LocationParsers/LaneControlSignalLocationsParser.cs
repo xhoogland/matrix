@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
@@ -62,13 +61,9 @@ namespace Matrix.Parsers.LocationParsers
             return data;
         }
 
-        public async Task DownloadImportableFile()
+        public void DownloadImportableFile()
         {
-            if (_downloadLocation == null)
-                return;
-
-            var file = ParserHelper.DownloadFile(_downloadLocation);
-            await File.WriteAllTextAsync(_fileLocation, file);
+            ParserHelper.DownloadFile(_downloadLocation, _fileLocation);
         }
     }
 }
