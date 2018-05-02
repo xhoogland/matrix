@@ -24,6 +24,11 @@ namespace Matrix.LocationsGenerator
                 MergeArrayHandling = MergeArrayHandling.Union
             });
             var config = JsonConvert.DeserializeObject<Config>(configFile.ToString());
+            if (config.ExportPath.StartsWith("__") && config.ExportPath.EndsWith("__"))
+                config.ExportPath = Directory.GetCurrentDirectory();
+            if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
+                config.LocationsPath = Directory.GetCurrentDirectory();
+
             // By calling something from the Parsers-dll, we ensure having it - and
             // used types - available in the list returned by GetAssemblies.
             var parsersName = ParserHelper.GetAssemblyName();
@@ -43,7 +48,7 @@ namespace Matrix.LocationsGenerator
             };
             var json = JsonConvert.SerializeObject(portals, settings);
 
-            File.WriteAllText("variableMessageSignPortalLocations.json", json);
+            File.WriteAllText(Path.Combine(config.ExportPath, config.LocationsPath, "locations.json"), json);
         }
 
         private static void DownloadDataForImport(List<LocationParser> locationParsers)

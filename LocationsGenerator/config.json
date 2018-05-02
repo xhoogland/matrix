@@ -3,5 +3,9 @@
     "VariableMessageSignParser": "LocatietabelDRIPS.xml.gz",
     "LaneControlSignalLocationsParser": "NDW_MRM_MSI_Shapes_April_2018.zip",
     "A1ReversibleLaneLaneControlSignalLocationsParser": "a1ReversibleLane.json"
-  }
+  },
+
+  "ExportPath": "__FullPath__",
+  "LocationsPath": "__LocationsPath__"
+
 }
