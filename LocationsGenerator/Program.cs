@@ -27,7 +27,7 @@ namespace Matrix.LocationsGenerator
             if (config.ExportPath.StartsWith("__") && config.ExportPath.EndsWith("__"))
                 config.ExportPath = Directory.GetCurrentDirectory();
             if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
-                config.LocationsPath = Directory.GetCurrentDirectory();
+                config.LocationsPath = string.Empty;
 
             // By calling something from the Parsers-dll, we ensure having it - and
             // used types - available in the list returned by GetAssemblies.
@@ -98,25 +98,30 @@ namespace Matrix.LocationsGenerator
         {
             VariableMessageSign vms;
             if (isLaneSpecific)
+            {
                 vms = new LaneControlSignal
                 {
                     Id = id,
                     Number = lane.Value
 
                 };
+            }
             else
+            {
                 vms = new VariableMessageSign
                 {
                     Id = id
                 };
+            }
 
-            var portal = portals.FirstOrDefault(p => p.Coordinates.AreCoordinatesInRange(coordinates) && isLaneSpecific);
+            var portal = portals.FirstOrDefault(p => p.Coordinates.AreCoordinatesInRange(coordinates) && p.IsLaneSpecific == isLaneSpecific);
             if (portal == null)
             {
                 portal = new VariableMessageSignPortal
                 {
                     Coordinates = coordinates,
-                    Country = "NL"
+                    Country = "NL",
+                    IsLaneSpecific = isLaneSpecific
                 };
                 portals.Add(portal);
             }

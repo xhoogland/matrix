@@ -9,6 +9,8 @@ namespace Matrix.ViewModels
 
         public string Country { get; set; }
 
+        public bool IsLaneSpecific { get; set; }
+
         public IList<RoadWay> RoadWays { get; set; }
 
         public VariableMessageSignPortal()
