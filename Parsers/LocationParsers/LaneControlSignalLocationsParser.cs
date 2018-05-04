@@ -28,13 +28,17 @@ namespace Matrix.Parsers.LocationParsers
             var features = new List<Feature>();
             foreach (var harlowFeature in harlowFeatures)
             {
+                var properties = harlowFeature.Properties;
+                properties.Road = properties.Road.ToUpper();
+                var cw = properties.Carriagew0.Trim();
+                properties.Carriagew0 = cw == "L" || cw == "R" ? cw : cw.ToUpper();
                 var feature = new Feature
                 {
                     Geometry = new Geometry
                     {
                         Coordinates = harlowFeature.Coordinates
                     },
-                    Properties = harlowFeature.Properties,
+                    Properties = properties,
                     Type = harlowFeature.Type
                 };
 
@@ -47,7 +51,7 @@ namespace Matrix.Parsers.LocationParsers
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
-            ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true);
+            await Task.Run(() => ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true));
             var extractFolderName = fileLocationSplit[1].Replace(".zip", string.Empty);
             var shapeFileDirectory = Path.Combine(fileLocationSplit[0], extractFolderName, "MSI");
             var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();

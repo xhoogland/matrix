@@ -28,8 +28,8 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
 	roadWays.forEach (function (roadWay) {
         if(isLaneSpecific)
         {
-            content = content + '<a href="#" onclick="addRoadWayHmLocationForSubscription(\'' + roadWay.hmLocation + '\')">' + roadWay.hmLocation + '</a>';
-            content = content + ' (<a href="#" onclick="deleteRoadWayHmLocationForSubscription(\'' + roadWay.hmLocation + '\')">X</a>)<br />';
+            content = content + '<a href="#" onclick="addRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">' + roadWay.HmLocation + '</a>';
+            content = content + ' (<a href="#" onclick="deleteRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">X</a>)<br />';
         }
         else
         {
@@ -37,8 +37,8 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
         }
 		
         roadWay.VariableMessageSigns.forEach(function (vmsLane) {
-			var shownSign = 'images/' + country + '/empty.png';
-			var laneNumber = 'Rijstrook ' + vmsLane.number;
+			var shownSign = 'images/' + country + '/blank.png';
+			var laneNumber = 'Rijstrook ' + vmsLane.Number;
             if (!isLaneSpecific) {
 				shownSign = '';
                 laneNumber = 'DRIP';
@@ -158,7 +158,7 @@ function initMap() {
                 if (!point.isVisible) {
                     point.marker.setMap(map);
                     point.infoWindow.open(map, point.marker);
-                    point.updateLiveMatrixImage(point.infoWindow.getContent());
+                    //point.updateLiveMatrixImage(point.infoWindow.getContent());
                     point.isVisible = true;
 				}
 			}
@@ -215,7 +215,7 @@ function loadStaticMatrixen () {
 				});
                 point.updateLiveMatrixImage = updateLiveMatrixImage;
 				
-                point.set(coordinate, point);
+                points.set(coordinate, point);
 			}
 		});
 		//loadLiveMatrixInfo(true);
