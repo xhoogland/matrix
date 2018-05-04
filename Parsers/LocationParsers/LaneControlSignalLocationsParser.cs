@@ -30,8 +30,8 @@ namespace Matrix.Parsers.LocationParsers
             {
                 var properties = harlowFeature.Properties;
                 properties.Road = properties.Road.ToUpper();
-                var cw = properties.Carriagew0.Trim();
-                properties.Carriagew0 = cw == "L" || cw == "R" ? cw : cw.ToUpper();
+                var cw = properties.Carriagew0.Trim().ToLower();
+                properties.Carriagew0 = cw == "l" || cw == "r" ? cw.ToUpper() : cw;
                 var feature = new Feature
                 {
                     Geometry = new Geometry
