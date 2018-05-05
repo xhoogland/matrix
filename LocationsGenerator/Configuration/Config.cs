@@ -6,8 +6,8 @@
 
         public FileLocation FileLocation { get; set; }
 
-        public string ExportPath { get; set; }
+        public string StartPath { get; set; }
 
-        public string LocationsPath { get; set; }
+        public string DataPath { get; set; }
     }
 }
