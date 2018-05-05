@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -27,14 +25,6 @@ namespace Matrix.Parsers
                         await decompressionStream.CopyToAsync(decompressedStream);
                     }
                 }
-            }
-        }
-
-        public static void DownloadFile(string url, string savePath)
-        {
-            using (var webClient = new WebClient())
-            {
-                webClient.DownloadFile(new Uri(url), savePath);
             }
         }
     }

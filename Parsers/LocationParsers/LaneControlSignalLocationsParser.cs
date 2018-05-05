@@ -10,16 +10,11 @@ using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    public class LaneControlSignalLocationsParser : LocationParser
+    public class LaneControlSignalLocationsParser : BaseLocationParser
     {
-        private string _fileLocation;
-
-        private string _downloadLocation;
-
         public LaneControlSignalLocationsParser(string fileLocation, string downloadLocation)
+            : base(fileLocation, downloadLocation)
         {
-            _fileLocation = fileLocation;
-            _downloadLocation = downloadLocation;
         }
 
         private string MapJsonToCorrectFormat(string jsonContent)
@@ -48,7 +43,7 @@ namespace Matrix.Parsers.LocationParsers
             return JsonConvert.SerializeObject(features);
         }
 
-        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
+        public override async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
             await Task.Run(() => ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true));
@@ -63,11 +58,6 @@ namespace Matrix.Parsers.LocationParsers
 
             var data = JsonConvert.DeserializeObject<IEnumerable<Feature>>(jsonContent);
             return data;
-        }
-
-        public void DownloadImportableFile()
-        {
-            ParserHelper.DownloadFile(_downloadLocation, _fileLocation);
         }
     }
 }

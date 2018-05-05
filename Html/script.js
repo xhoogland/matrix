@@ -154,7 +154,7 @@ function initMap() {
             if ((point.marker.position.lat() > map.getBounds().f.b && point.marker.position.lat() < map.getBounds().f.f)
                 && (point.marker.position.lng() > map.getBounds().b.b && point.marker.position.lng() < map.getBounds().b.f)
                 && map.zoom > 13//) {
-			    && pointShouldBeVisible(tssValue, point.type)) {
+			    && pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
                 if (!point.isVisible) {
                     point.marker.setMap(map);
                     point.infoWindow.open(map, point.marker);
