@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    public class LaneControlSignalLocationsParser : BaseLocationParser
+    public class LaneControlSignalLocationsParser : BaseParser, LocationParser
     {
-        public LaneControlSignalLocationsParser(string fileLocation, string downloadLocation)
-            : base(fileLocation, downloadLocation)
+        public LaneControlSignalLocationsParser(string downloadLocation, string fileLocation)
+            : base(downloadLocation, fileLocation)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Matrix.Parsers.LocationParsers
             return JsonConvert.SerializeObject(features);
         }
 
-        public override async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
             await Task.Run(() => ZipFile.ExtractToDirectory(_fileLocation, fileLocationSplit[0], true));

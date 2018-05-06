@@ -9,17 +9,17 @@ using System.Xml;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    public class VariableMessageSignParser : BaseLocationParser
+    public class VariableMessageSignParser : BaseParser, LocationParser
     {
-        public VariableMessageSignParser(string fileLocation, string downloadLocation)
-            : base (fileLocation, downloadLocation)
+        public VariableMessageSignParser(string downloadLocation, string fileLocation)
+            : base(downloadLocation, fileLocation)
         {
         }
 
-        public override async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var destinationFile = string.Format("{0}.{1}", _fileLocation, "txt");
-            await ParserHelper.ExtractGzToFile(_fileLocation, destinationFile);
+            await ExtractGzToFile(destinationFile);
             var xmlFile = await File.ReadAllTextAsync(destinationFile);
 
             var xmlDocument = new XmlDocument();

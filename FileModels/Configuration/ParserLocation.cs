@@ -1,6 +1,6 @@
-﻿namespace Matrix.LocationsGenerator.Configuration
+﻿namespace Matrix.FileModels.Configuration
 {
-    internal abstract class ParserLocation
+    public abstract class ParserLocation
     {
         public string VariableMessageSignParser { get; set; }
 

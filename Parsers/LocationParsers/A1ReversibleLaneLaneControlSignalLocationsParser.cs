@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Matrix.Parsers.LocationParsers
 {
-    public class A1ReversibleLaneLaneControlSignalLocationsParser : BaseLocationParser
+    public class A1ReversibleLaneLaneControlSignalLocationsParser : BaseParser, LocationParser
     {
-        public A1ReversibleLaneLaneControlSignalLocationsParser(string fileLocation, string downloadLocation)
-            : base(fileLocation, downloadLocation)
+        public A1ReversibleLaneLaneControlSignalLocationsParser(string downloadLocation, string fileLocation)
+            : base(downloadLocation, fileLocation)
         {
         }
 
-        public override async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
+        public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var jsonContent = await File.ReadAllTextAsync(_fileLocation);
             var data = JsonConvert.DeserializeObject<LaneControlSignalLocations>(jsonContent);

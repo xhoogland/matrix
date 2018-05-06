@@ -1,6 +1,6 @@
-﻿namespace Matrix.LocationsGenerator.Configuration
+﻿namespace Matrix.FileModels.Configuration
 {
-    internal class Config
+    public class Config
     {
         public DownloadLocation DownloadLocation { get; set; }
 
