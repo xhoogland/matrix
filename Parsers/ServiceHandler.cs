@@ -58,15 +58,14 @@ namespace Matrix.SpecificImplementations
             if (downloadUrl != null)
                 downloadUrl = downloadUrl.ToString();
 
-            var objectInstance = Activator.CreateInstance(type, filePath, downloadUrl);
+            var objectInstance = Activator.CreateInstance(type, downloadUrl, filePath);
             return (TParserInterface)objectInstance;
         }
 
-        public IList<TParserInterface> GetParserImplementations()//string assemblyNameContainingParsers)
+        public IList<TParserInterface> GetParserImplementations()
         {
             var interfaceImplemented = typeof(TParserInterface);
 
-            //.Where(a => a.FullName == assemblyNameContainingParsers)
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
                           .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
                           .Select(CreateObjectInstance).ToList();
