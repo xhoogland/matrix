@@ -1,0 +1,8 @@
+﻿{
+  "SaveFileName": {
+    "MatrixsignaalinformatieLiveDataParser": "Matrixsignaalinformatie.xml.gz"
+  },
+
+  "StartPath": "__FullPath__",
+  "DataPath": "__DataPath__"
+}

@@ -48,13 +48,13 @@ namespace Matrix.SpecificImplementations
 
         private TParserInterface CreateObjectInstance(Type type)
         {
-            var flProperties = _config.FileLocation.GetType().GetProperties();
-            var dlProperties = _config.DownloadLocation.GetType().GetProperties();
+            var flProperties = _config.SaveFileName.GetType().GetProperties();
+            var dlProperties = _config.DownloadUrl.GetType().GetProperties();
             bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
             var flProperty = flProperties.First(p => getPropertyByType(type, p));
             var dlProperty = flProperties.First(p => getPropertyByType(type, p));
-            var filePath = Path.Combine("Import", flProperty.GetValue(_config.FileLocation).ToString());
-            var downloadUrl = flProperty.GetValue(_config.DownloadLocation);
+            var filePath = Path.Combine("Import", flProperty.GetValue(_config.SaveFileName).ToString());
+            var downloadUrl = flProperty.GetValue(_config.DownloadUrl);
             if (downloadUrl != null)
                 downloadUrl = downloadUrl.ToString();
 

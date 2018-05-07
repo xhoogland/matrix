@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="LiveDataParsers\" />
-  </ItemGroup>
-
 </Project>

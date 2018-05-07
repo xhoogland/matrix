@@ -15,13 +15,13 @@ namespace Matrix.LocationsGenerator
         {
             var serviceHandler = new ServiceHandler<LocationParser>();
 
-            var parsers = serviceHandler.GetParserImplementations();
+            var locationParsers = serviceHandler.GetParserImplementations();
 
-            DownloadDataForImport(parsers);
+            DownloadDataForImport(locationParsers);
 
-            var portals = FillPortalsAsync(parsers).Result;
+            var portalLocations = FillPortalsAsync(locationParsers).Result;
 
-            var json = JsonConvert.SerializeObject(portals, serviceHandler.JsonConfig);
+            var json = JsonConvert.SerializeObject(portalLocations, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(json, "locations.json");
         }
 

@@ -1,9 +1,9 @@
-﻿namespace Matrix.FileModels.VariableMessageSignLocations
-{
-    public class VariableMessageSignLocations
-    {
-        public Xml Xml { get; set; }
+﻿using Matrix.FileModels.XmlToJson;
 
+namespace Matrix.FileModels.VariableMessageSignLocations
+{
+    public class VariableMessageSignLocations : RootObject
+    {
         public SoapEnvelope SoapEnvelope { get; set; }
     }
 }

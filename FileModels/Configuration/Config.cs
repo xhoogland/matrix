@@ -2,9 +2,9 @@
 {
     public class Config
     {
-        public DownloadLocation DownloadLocation { get; set; }
+        public DownloadUrl DownloadUrl { get; set; }
 
-        public FileLocation FileLocation { get; set; }
+        public SaveFileName SaveFileName { get; set; }
 
         public string StartPath { get; set; }
 

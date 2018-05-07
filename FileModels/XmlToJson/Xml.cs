@@ -1,4 +1,4 @@
-﻿namespace Matrix.FileModels.VariableMessageSignLocations
+﻿namespace Matrix.FileModels.XmlToJson
 {
     public class Xml
     {

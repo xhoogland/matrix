@@ -1,7 +1,7 @@
 ﻿namespace Matrix.FileModels.Configuration
 {
-    public class FileLocation : ParserLocation
+    public class DownloadUrl : Parsers
     {
-
+        
     }
 }
