@@ -44,7 +44,7 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
                 laneNumber = 'DRIP';
 			}
 
-            content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" />&nbsp;';
+            content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" data-islanespecific="' + (isLaneSpecific ? 'true' : 'false') + '" data-country="' + country + '"/>&nbsp;';
 		});
 		content = content + '<br />';
 	});
@@ -54,7 +54,7 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
 
 var map;
 var points = new Map();
-var liveMatrixBorden = [];
+var liveVmsList = [];
 const ShownTypes = {
     BOTH: 0,
     MATRIX: 1,
@@ -158,7 +158,7 @@ function initMap() {
                 if (!point.isVisible) {
                     point.marker.setMap(map);
                     point.infoWindow.open(map, point.marker);
-                    //point.updateLiveMatrixImage(point.infoWindow.getContent());
+                    point.updateLiveMatrixImage(point.infoWindow.getContent());
                     point.isVisible = true;
 				}
 			}
@@ -190,11 +190,11 @@ function pointShouldBeVisible(dropdownValue, pointType) {
 
 function loadMatrixen () {
 	loadStaticMatrixen();
-	//setInterval(loadLiveMatrixInfo, 1001*60*2);
+	setInterval(loadLiveMatrixInfo, 1001*60*2);
 }
 
 function loadStaticMatrixen () {
-	loadJson('static/locations.json?1519139645', function(locations) {
+	loadJson('static/locations.json?1525899901', function(locations) {
         locations.forEach (function (location) {
             var coordinate = location.Coordinates.X + '_' + location.Coordinates.Y;
 			if (!points.has(coordinate)) {						
@@ -218,14 +218,14 @@ function loadStaticMatrixen () {
                 points.set(coordinate, point);
 			}
 		});
-		//loadLiveMatrixInfo(true);
+		loadLiveMatrixInfo(true);
 	});
 }
 
 function loadLiveMatrixInfo (firstLoad) {
-	loadJson('live/matrixBorden.json?' + Math.floor(Date.now() / 1000), function(liveMatrixBordenJson) {
-		liveMatrixBordenJson.forEach (function (liveMatrixBord) {
-			liveMatrixBorden[liveMatrixBord.uuid] = liveMatrixBord.shownSign;
+    loadJson('live/liveData.json?' + Math.floor(Date.now() / 1000), function(liveData) {
+        liveData.forEach (function (liveVms) {
+			liveVmsList[liveVms.Id] = liveVms.Sign;
 		});
 		
         points.forEach(function (point) {
@@ -245,17 +245,12 @@ function updateLiveMatrixImage(infoWindowContent) {
 	html.innerHTML = infoWindowContent;
 	var imgList = Array.from(html.getElementsByTagName('img'));
 	imgList.forEach(function (imgTag) {
-		var element = document.getElementById(imgTag.id);
-        if (element) {
-            var liveMatrixBord = liveMatrixBorden[imgTag.id];
-            if (!liveMatrixBord)
-                liveMatrixBord = 'MSI-afbeeldingen/onbekend.png';
-            
-            if (element.title != 'DRIP')
-                element.src = 'MSI-afbeeldingen/' + liveMatrixBord + '.png';
-            else
-                element.src = liveMatrixBorden[imgTag.id];
-        }
+        var element = document.getElementById(imgTag.id);
+		var imageSource = liveVmsList[imgTag.id];
+		if (element.getAttribute('data-islanespecific') == 'true')
+			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + imageSource + '.png');
+		else
+			element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : liveVmsList[imgTag.id]);
 	});
 }
 
