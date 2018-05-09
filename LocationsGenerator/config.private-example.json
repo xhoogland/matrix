@@ -1,7 +1,7 @@
 ﻿{
   "DownloadUrl": {
-    "VariableMessageSignParser": "",
-    "LaneControlSignalLocationsParser": "",
-    "A1ReversibleLaneLaneControlSignalLocationsParser": ""
+    "NLDGeneralVMSLocationsParser": "",
+    "NLDGeneralLCSLocationsParser": "",
+    "NLDSAAReversibleLaneLCSLocationsParser": ""
   }
 }

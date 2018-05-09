@@ -1,8 +1,8 @@
 ﻿{
   "SaveFileName": {
-    "VariableMessageSignParser": "LocatietabelDRIPS.xml.gz",
-    "LaneControlSignalLocationsParser": "NDW_MRM_MSI_Shapes_April_2018.zip",
-    "A1ReversibleLaneLaneControlSignalLocationsParser": "a1ReversibleLane.json"
+    "NLDGeneralVMSLocationsParser": "LocatietabelDRIPS.xml.gz",
+    "NLDGeneralLCSLocationsParser": "NDW_MRM_MSI_Shapes_April_2018.zip",
+    "NLDSAAReversibleLaneLCSLocationsParser": "a1ReversibleLane.json"
   },
 
   "StartPath": "__FullPath__",
