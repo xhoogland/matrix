@@ -47,7 +47,14 @@ namespace LiveDataGenerator
             var liveDataList = new List<VariableMessageSign>();
             foreach (var location in allLiveData)
             {
+                if (location.Sign == null)
+                    continue;
 
+                liveDataList.Add(new VariableMessageSign
+                {
+                    Id = location.Id,
+                    Sign = location.Sign
+                });
             }
 
             return liveDataList;

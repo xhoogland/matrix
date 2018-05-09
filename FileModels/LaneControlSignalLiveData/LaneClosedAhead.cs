@@ -1,11 +1,9 @@
 ﻿namespace Matrix.FileModels.LaneControlSignalLiveData
 {
-    public class LaneClosedAhead
+    public class LaneClosedAhead : Msi
     {
-        public string Flashing { get; set; }
+        public bool MergeLeft { get; set; }
 
-        public object MergeLeft { get; set; }
-
-        public object MergeRight { get; set; }
+        public bool MergeRight { get; set; }
     }
 }

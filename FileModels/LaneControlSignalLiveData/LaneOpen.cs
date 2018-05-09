@@ -1,7 +1,7 @@
 ﻿namespace Matrix.FileModels.LaneControlSignalLiveData
 {
-    public class LaneOpen
+    public class LaneOpen : Msi
     {
-        public string Flashing { get; set; }
+
     }
 }

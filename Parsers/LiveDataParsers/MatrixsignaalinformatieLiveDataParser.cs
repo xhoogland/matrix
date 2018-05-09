@@ -9,13 +9,6 @@ using System.Xml;
 
 namespace Matrix.Parsers.LiveDataParsers
 {
-    class LiveDataImpl : LiveData
-    {
-        public string Id => throw new System.NotImplementedException();
-
-        public string Sign => throw new System.NotImplementedException();
-    }
-
     public class MatrixsignaalinformatieLiveDataParser : BaseParser, LiveDataParser
     {
         public MatrixsignaalinformatieLiveDataParser(string downloadLocation, string fileLocation)
@@ -41,6 +34,8 @@ namespace Matrix.Parsers.LiveDataParsers
             xmlAsJsonContent = hashRegex.Replace(xmlAsJsonContent, "\"$1");
             var underscoreRegex = new Regex("([a-zA-Z])_([a-zA-Z])");
             xmlAsJsonContent = underscoreRegex.Replace(xmlAsJsonContent, "$1$2");
+            xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeleft\":null", "\"mergeleft\":true");
+            xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeright\":null", "\"mergeright\":true");
 
             var data = JsonConvert.DeserializeObject<LaneControlSignalLiveData>(xmlAsJsonContent);
             return data.SoapEnvelope.SoapBody.NdwNdwVms.VariableMessageSignEvents.Event;

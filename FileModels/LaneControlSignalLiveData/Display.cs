@@ -8,7 +8,7 @@
 
         public Speedlimit Speedlimit { get; set; }
 
-        public object Unknown { get; set; }
+        public Msi Unknown { get; set; }
 
         public LaneOpen LaneOpen { get; set; }
 
