@@ -1,4 +1,4 @@
-﻿using Matrix.FileModels.Locations.VMSLocations;
+﻿using Matrix.FileModels.Locations.VMS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;

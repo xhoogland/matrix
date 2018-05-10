@@ -1,4 +1,4 @@
-﻿using Matrix.FileModels.Locations.LCSLocations;
+﻿using Matrix.FileModels.Locations.LCS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
