@@ -37,7 +37,7 @@ namespace LiveDataGenerator
 
         private static async Task<List<VariableMessageSign>> FillLiveDataAsync(IList<LiveDataParser> liveDataParsers, string savePath)
         {
-            var vmsPath = Path.Combine(savePath, "VMS");
+            var vmsPath = Path.Combine(savePath, "images", "VMS");
             Directory.CreateDirectory(vmsPath);
             var retrieveLiveDataTasks = new List<Task<IEnumerable<LiveData>>>();
             foreach (var locationParser in liveDataParsers)

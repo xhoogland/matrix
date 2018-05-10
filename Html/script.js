@@ -250,7 +250,7 @@ function updateLiveMatrixImage(infoWindowContent) {
 		if (element.getAttribute('data-islanespecific') == 'true')
 			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + imageSource + '.png');
 		else
-			element.setAttribute('src', 'live/VMS/' + (!liveVmsList[imgTag.id] ? '' : liveVmsList[imgTag.id]));
+			element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + liveVmsList[imgTag.id]);
 	});
 }
 
