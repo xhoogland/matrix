@@ -1,4 +1,4 @@
-﻿namespace Matrix.FileModels.LaneControlSignalLiveData
+﻿namespace Matrix.FileModels.LiveData.LCS
 {
     public class LaneClosedAhead : Msi
     {

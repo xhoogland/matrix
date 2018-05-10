@@ -1,9 +1,8 @@
-﻿using Matrix.Interfaces;
-using System;
+﻿using System;
 
-namespace Matrix.FileModels.LaneControlSignalLiveData
+namespace Matrix.FileModels.LiveData.LCS
 {
-    public class Event : LiveData
+    public class Event : Interfaces.LiveData
     {
         public DateTime TsEvent { get; set; }
 

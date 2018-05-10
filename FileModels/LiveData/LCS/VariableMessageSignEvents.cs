@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Matrix.FileModels.LaneControlSignalLiveData
+namespace Matrix.FileModels.LiveData.LCS
 {
     public class VariableMessageSignEvents
     {

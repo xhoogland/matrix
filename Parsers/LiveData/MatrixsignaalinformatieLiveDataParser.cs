@@ -1,4 +1,4 @@
-﻿using Matrix.FileModels.LaneControlSignalLiveData;
+﻿using Matrix.FileModels.LiveData.LCS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;

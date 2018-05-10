@@ -1,6 +1,6 @@
 ﻿using Matrix.FileModels.XmlToJson;
 
-namespace Matrix.FileModels.LaneControlSignalLiveData
+namespace Matrix.FileModels.LiveData.LCS
 {
     public class SoapEnvelope : Envelope
     {
