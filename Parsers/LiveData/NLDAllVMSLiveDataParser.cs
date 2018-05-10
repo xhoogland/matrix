@@ -1,4 +1,4 @@
-﻿using Matrix.FileModels.LiveData.NLDLCS;
+﻿using Matrix.FileModels.LiveData.NLDVMS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -34,11 +34,9 @@ namespace Matrix.Parsers.LiveData
             xmlAsJsonContent = hashRegex.Replace(xmlAsJsonContent, "\"$1");
             var underscoreRegex = new Regex("([a-zA-Z])_([a-zA-Z])");
             xmlAsJsonContent = underscoreRegex.Replace(xmlAsJsonContent, "$1$2");
-            xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeleft\":null", "\"mergeleft\":true");
-            xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeright\":null", "\"mergeright\":true");
 
-            var data = JsonConvert.DeserializeObject<NLDLCSLiveData>(xmlAsJsonContent);
-            return data.SoapEnvelope.SoapBody.NdwNdwVms.VariableMessageSignEvents.Event;
+            var data = JsonConvert.DeserializeObject<NLDVMSLiveData>(xmlAsJsonContent);
+            return data.SoapEnvelope.SoapBody.D2LogicalModel.PayloadPublication.VmsUnit;
         }
     }
 }

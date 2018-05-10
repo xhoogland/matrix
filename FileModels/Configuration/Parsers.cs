@@ -9,5 +9,7 @@
         public string NLDSAAReversibleLaneLCSLocationsParser { get; set; }
 
         public string NLDAllLCSLiveDataParser { get; set; }
+
+        public string NLDAllVMSLiveDataParser { get; set; }
     }
 }

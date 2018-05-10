@@ -1,6 +1,7 @@
 ﻿{
   "SaveFileName": {
-    "NLDAllLCSLiveDataParser": "Matrixsignaalinformatie.xml.gz"
+    "NLDAllLCSLiveDataParser": "Matrixsignaalinformatie.xml.gz",
+    "NLDAllVMSLiveDataParser": "DRIPS.xml.gz"
   },
 
   "StartPath": "__FullPath__",
