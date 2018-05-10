@@ -2,7 +2,7 @@
 using Matrix.SpecificImplementations;
 using System.Linq;
 
-namespace Matrix.FileModels.Locations.LCS
+namespace Matrix.FileModels.Locations.NLDLCS
 {
     public class Feature : Location
     {

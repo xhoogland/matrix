@@ -1,5 +1,5 @@
 ﻿using Harlow;
-using Matrix.FileModels.Locations.LCS;
+using Matrix.FileModels.Locations.NLDLCS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Matrix.Parsers.LocationParsers
+namespace Matrix.Parsers.Locations
 {
     public class NLDGeneralLCSLocationsParser : BaseParser, LocationParser
     {

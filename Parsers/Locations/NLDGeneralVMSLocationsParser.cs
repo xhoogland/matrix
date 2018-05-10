@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Matrix.Parsers.LocationParsers
+namespace Matrix.Parsers.Locations
 {
     public class NLDGeneralVMSLocationsParser : BaseParser, LocationParser
     {
@@ -33,7 +33,7 @@ namespace Matrix.Parsers.LocationParsers
             var hashRegex = new Regex("\"#([a-z])");
             xmlAsJsonContent = hashRegex.Replace(xmlAsJsonContent, "\"$1");
 
-            var data = JsonConvert.DeserializeObject<VMSLocations>(xmlAsJsonContent);
+            var data = JsonConvert.DeserializeObject<NLDVMSLocations>(xmlAsJsonContent);
             return data.SoapEnvelope.SoapBody.D2LogicalModel.PayloadPublication.VmsUnitTable.VmsUnitRecord;
         }
     }

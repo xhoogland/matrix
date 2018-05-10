@@ -1,11 +1,11 @@
-﻿using Matrix.FileModels.Locations.LCS;
+﻿using Matrix.FileModels.Locations.NLDLCS;
 using Matrix.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Matrix.Parsers.LocationParsers
+namespace Matrix.Parsers.Locations
 {
     public class NLDSAAReversibleLaneLCSLocationsParser : BaseParser, LocationParser
     {
@@ -17,7 +17,7 @@ namespace Matrix.Parsers.LocationParsers
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
             var jsonContent = await File.ReadAllTextAsync(_fileLocation);
-            var data = JsonConvert.DeserializeObject<LCSLocations>(jsonContent);
+            var data = JsonConvert.DeserializeObject<NLDLCSLocations>(jsonContent);
             return data.Features;
         }
     }

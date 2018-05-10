@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Matrix.FileModels.Locations.LCS
+namespace Matrix.FileModels.Locations.NLDLCS
 {
-    public class LCSLocations
+    public class NLDLCSLocations
     {
         public string Type { get; set; }
 

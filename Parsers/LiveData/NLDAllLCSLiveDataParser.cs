@@ -7,16 +7,16 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Matrix.Parsers.LiveDataParsers
+namespace Matrix.Parsers.LiveData
 {
-    public class MatrixsignaalinformatieLiveDataParser : BaseParser, LiveDataParser
+    public class NLDAllLCSLiveDataParser : BaseParser, LiveDataParser
     {
-        public MatrixsignaalinformatieLiveDataParser(string downloadLocation, string fileLocation)
+        public NLDAllLCSLiveDataParser(string downloadLocation, string fileLocation)
             : base(downloadLocation, fileLocation)
         {
         }
 
-        public async Task<IEnumerable<LiveData>> RetrieveLiveDataFromContent()
+        public async Task<IEnumerable<Interfaces.LiveData>> RetrieveLiveDataFromContent()
         {
             var destinationFile = string.Format("{0}.{1}", _fileLocation, "txt");
             await ExtractGzToFile(destinationFile);
@@ -37,7 +37,7 @@ namespace Matrix.Parsers.LiveDataParsers
             xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeleft\":null", "\"mergeleft\":true");
             xmlAsJsonContent = xmlAsJsonContent.Replace("\"mergeright\":null", "\"mergeright\":true");
 
-            var data = JsonConvert.DeserializeObject<LaneControlSignalLiveData>(xmlAsJsonContent);
+            var data = JsonConvert.DeserializeObject<NLDLCSLiveData>(xmlAsJsonContent);
             return data.SoapEnvelope.SoapBody.NdwNdwVms.VariableMessageSignEvents.Event;
         }
     }
