@@ -2,12 +2,12 @@
 {
     public abstract class Parsers
     {
-        public string NLDGeneralVMSLocationsParser { get; set; }
+        public string NLDAllVMSLocationsParser { get; set; }
 
         public string NLDGeneralLCSLocationsParser { get; set; }
 
         public string NLDSAAReversibleLaneLCSLocationsParser { get; set; }
 
-        public string MatrixsignaalinformatieLiveDataParser { get; set; }
+        public string NLDAllLCSLiveDataParser { get; set; }
     }
 }

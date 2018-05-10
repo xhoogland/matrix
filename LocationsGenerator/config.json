@@ -1,6 +1,6 @@
 ﻿{
   "SaveFileName": {
-    "NLDGeneralVMSLocationsParser": "LocatietabelDRIPS.xml.gz",
+    "NLDAllVMSLocationsParser": "LocatietabelDRIPS.xml.gz",
     "NLDGeneralLCSLocationsParser": "NDW_MRM_MSI_Shapes_April_2018.zip",
     "NLDSAAReversibleLaneLCSLocationsParser": "a1ReversibleLane.json"
   },
