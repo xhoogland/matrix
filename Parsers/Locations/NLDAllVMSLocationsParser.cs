@@ -9,9 +9,9 @@ using System.Xml;
 
 namespace Matrix.Parsers.Locations
 {
-    public class NLDGeneralVMSLocationsParser : BaseParser, LocationParser
+    public class NLDAllVMSLocationsParser : BaseParser, LocationParser
     {
-        public NLDGeneralVMSLocationsParser(string downloadLocation, string fileLocation)
+        public NLDAllVMSLocationsParser(string downloadLocation, string fileLocation)
             : base(downloadLocation, fileLocation)
         {
         }
