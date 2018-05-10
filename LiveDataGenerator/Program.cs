@@ -2,6 +2,7 @@
 using Matrix.SpecificImplementations;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace LiveDataGenerator
 
             DownloadDataForImport(liveDataParsers);
 
-            var liveData = FillLiveDataAsync(liveDataParsers).Result;
+            var liveData = FillLiveDataAsync(liveDataParsers, serviceHandler.SavePath).Result;
 
             var json = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(json, "liveData.json");
@@ -34,8 +35,10 @@ namespace LiveDataGenerator
             }
         }
 
-        private static async Task<List<VariableMessageSign>> FillLiveDataAsync(IList<LiveDataParser> liveDataParsers)
+        private static async Task<List<VariableMessageSign>> FillLiveDataAsync(IList<LiveDataParser> liveDataParsers, string savePath)
         {
+            var vmsPath = Path.Combine(savePath, "VMS");
+            Directory.CreateDirectory(vmsPath);
             var retrieveLiveDataTasks = new List<Task<IEnumerable<LiveData>>>();
             foreach (var locationParser in liveDataParsers)
             {
@@ -45,19 +48,40 @@ namespace LiveDataGenerator
             var liveDataWhenAll = await Task.WhenAll(retrieveLiveDataTasks);
             var allLiveData = liveDataWhenAll.SelectMany(result => result);
             var liveDataList = new List<VariableMessageSign>();
-            foreach (var location in allLiveData)
+            foreach (var liveObject in allLiveData)
             {
-                if (location.Sign == null)
+                if (liveObject.Sign == null)
                     continue;
+
+                var sign = liveObject.Sign;
+                if (liveObject.HasBinary.HasValue && liveObject.HasBinary.Value)
+                {
+                    var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
+                    File.WriteAllBytes(fullPath, Convert.FromBase64String(sign));
+                    sign = liveObject.Id;
+                }
 
                 liveDataList.Add(new VariableMessageSign
                 {
-                    Id = location.Id,
-                    Sign = location.Sign
+                    Id = liveObject.Id,
+                    Sign = sign
                 });
             }
 
             return liveDataList;
+        }
+
+        private static string StripTextOfInvalidCharsForSaveToFileSystem(string text)
+        {
+            var invalidChars = Path.GetInvalidFileNameChars().Union(Path.GetInvalidPathChars()).ToArray();
+            var resultText = string.Empty;
+
+            foreach (var invalidChar in invalidChars)
+            {
+                resultText = text.Replace(invalidChar.ToString(), string.Empty);
+            }
+
+            return resultText;
         }
     }
 }

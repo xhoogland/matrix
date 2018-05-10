@@ -39,5 +39,7 @@ namespace Matrix.FileModels.LiveData.NLDLCS
                 return "unknown";
             }
         }
+
+        public bool? HasBinary => null;
     }
 }

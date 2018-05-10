@@ -15,6 +15,8 @@ namespace Matrix.SpecificImplementations
 
         public JsonSerializerSettings JsonConfig { get; }
 
+        public string SavePath { get; }
+
         public ServiceHandler()
         {
             _config = GetConfig();
@@ -22,6 +24,7 @@ namespace Matrix.SpecificImplementations
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
+            SavePath = Path.Combine(_config.StartPath, _config.DataPath);
         }
 
         private Config GetConfig()

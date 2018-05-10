@@ -5,5 +5,7 @@
         string Id { get; }
 
         string Sign { get; }
+
+        bool? HasBinary { get; }
     }
 }

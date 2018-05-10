@@ -14,13 +14,15 @@
         {
             get
             {
-                var vmsMessageExtension = Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension;
-                if (vmsMessageExtension == null)
+                if (VmsMessageExtension == null)
                     return null;
 
-                var imageData = vmsMessageExtension.vmsMessageExtension.VmsImage.ImageData;
-                return string.Format("data:{0};{1},{2}", imageData.MimeType, imageData.Encoding, imageData.Binary);
+                return VmsMessageExtension.vmsMessageExtension.VmsImage.ImageData.Binary;
             }
         }
+
+        public bool? HasBinary => VmsMessageExtension.vmsMessageExtension.VmsImage.ImageData.Binary != null;
+
+        private VmsMessageExtension VmsMessageExtension => Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension;
     }
 }
