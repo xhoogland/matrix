@@ -5,6 +5,8 @@ namespace Matrix.FileModels.Locations.NLDVMS
 {
     public class VmsUnitRecord : Location
     {
+        private string _id;
+
         public byte NumberOfVms { get; set; }
 
         public VmsRecordVmsRecord VmsRecord { get; set; }
@@ -28,7 +30,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
 
         public float? Km => null;
 
-        public string Id { get; set; }
+        public string Id { get => _id.Replace('_'.ToString(), string.Empty); set => _id = value; }
 
         public int? Lane => null;
 

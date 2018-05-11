@@ -8,7 +8,7 @@
 
         public Vms Vms { get; set; }
 
-        public string Id => VmsUnitReference.Id;
+        public string Id => VmsUnitReference.Id.Replace('_'.ToString(), string.Empty);
 
         public string Sign
         {
