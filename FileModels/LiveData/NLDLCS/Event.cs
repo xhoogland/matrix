@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Matrix.Enums;
+using System;
 
 namespace Matrix.FileModels.LiveData.NLDLCS
 {
@@ -40,6 +41,6 @@ namespace Matrix.FileModels.LiveData.NLDLCS
             }
         }
 
-        public bool? HasBinary => null;
+        public DataType DataType => DataType.Image;
     }
 }

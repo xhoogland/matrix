@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Matrix.FileModels.LiveData.NLDVMS
 {
     public class VmsText
     {
-        public object VmsTextLine { get; set; }
+        public JRaw VmsTextLine { get; set; }
     }
 }

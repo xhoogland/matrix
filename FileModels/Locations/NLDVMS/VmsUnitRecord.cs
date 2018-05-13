@@ -30,7 +30,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
 
         public float? Km => null;
 
-        public string Id { get => _id.Replace('_'.ToString(), string.Empty); set => _id = value; }
+        public string Id { get => _id.Replace("_", string.Empty); set => _id = value; }
 
         public int? Lane => null;
 

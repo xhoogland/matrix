@@ -1,4 +1,6 @@
-﻿namespace Matrix.Interfaces
+﻿using Matrix.Enums;
+
+namespace Matrix.Interfaces
 {
     public interface LiveData
     {
@@ -6,6 +8,6 @@
 
         string Sign { get; }
 
-        bool? HasBinary { get; }
+        DataType DataType { get; }
     }
 }

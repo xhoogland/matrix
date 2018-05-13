@@ -1,4 +1,5 @@
-﻿using Matrix.Interfaces;
+﻿using Matrix.Enums;
+using Matrix.Interfaces;
 using Matrix.SpecificImplementations;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
@@ -50,15 +51,30 @@ namespace LiveDataGenerator
             var liveDataList = new List<VariableMessageSign>();
             foreach (var liveObject in allLiveData)
             {
-                if (liveObject.Sign == null)
-                    continue;
-
-                var sign = liveObject.Sign;
-                if (liveObject.HasBinary.HasValue && liveObject.HasBinary.Value)
+                var sign = string.Empty;
+                switch(liveObject.DataType)
                 {
-                    var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
-                    File.WriteAllBytes(fullPath, Convert.FromBase64String(sign));
-                    sign = liveObject.Id;
+                    case DataType.Image:
+                    {
+                        sign = liveObject.Sign;
+                        break;
+                    }
+                    case DataType.Base64:
+                    {
+                        var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
+                        File.WriteAllBytes(fullPath, Convert.FromBase64String(liveObject.Sign));
+                        sign = liveObject.Id;
+                        break;
+                    }
+                    case DataType.TextPage:
+                    {
+                        sign = liveObject.Sign.Replace("|", "\r\n");
+                        break;
+                    }
+                    default:
+                    {
+                        continue;
+                    }
                 }
 
                 liveDataList.Add(new VariableMessageSign

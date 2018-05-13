@@ -1,4 +1,9 @@
-﻿namespace Matrix.FileModels.LiveData.NLDVMS
+﻿using Matrix.Enums;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Matrix.FileModels.LiveData.NLDVMS
 {
     public class VmsUnit : Interfaces.LiveData
     {
@@ -8,21 +13,53 @@
 
         public Vms Vms { get; set; }
 
-        public string Id => VmsUnitReference.Id.Replace('_'.ToString(), string.Empty);
+        public string Id => VmsUnitReference.Id.Replace("_", string.Empty);
 
         public string Sign
         {
             get
             {
-                if (VmsMessageExtension == null)
-                    return null;
+                if (Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension != null)
+                    return Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension.vmsMessageExtension.VmsImage.ImageData.Binary;
 
-                return VmsMessageExtension.vmsMessageExtension.VmsImage.ImageData.Binary;
+                var vmsTextLine = Vms.vms.VmsMessage.vmsMessage.TextPage.VmsText.VmsTextLine.ToString();
+                if (vmsTextLine.StartsWith('{') && vmsTextLine.EndsWith('}'))
+                    vmsTextLine = string.Format("[{0}]", vmsTextLine);
+
+                var vmsTextLineList = JsonConvert.DeserializeObject<IEnumerable<VmsTextLine>>(vmsTextLine);
+                return FormatLinesForParser(vmsTextLineList);
             }
         }
 
-        public bool? HasBinary => VmsMessageExtension.vmsMessageExtension.VmsImage.ImageData.Binary != null;
+        public DataType DataType
+        {
+            get
+            {
+                var vme = Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension;
+                if (vme != null && vme.vmsMessageExtension.VmsImage.ImageData.Binary != null)
+                    return DataType.Base64;
 
-        private VmsMessageExtension VmsMessageExtension => Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension;
+                if (Vms.vms.VmsMessage.vmsMessage.TextPage != null)
+                    return DataType.TextPage;
+
+                return DataType.Unknown;
+            }
+        }
+
+        private string FormatLinesForParser(IEnumerable<VmsTextLine> vmsTextLineList)
+        {
+            var result = new StringBuilder();
+
+            foreach (var line in vmsTextLineList)
+            {
+                var vmsTextLine = line.vmsTextLine.VmsTextLine;
+                if (vmsTextLine == null)
+                    vmsTextLine = ".";
+
+                result.AppendFormat("{0}|", vmsTextLine);
+            }
+
+            return result.ToString().TrimEnd('|');
+        }
     }
 }
