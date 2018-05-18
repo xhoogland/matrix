@@ -29,8 +29,8 @@ namespace Matrix.SpecificImplementations
 
         private Config GetConfig()
         {
-            var configFile = JObject.Parse(File.ReadAllText("config.json"));
-            var configPrivateFile = JObject.Parse(File.ReadAllText("config.private.json"));
+            var configFile = JObject.Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "config.json")));
+            var configPrivateFile = JObject.Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "config.private.json")));
             configFile.Merge(configPrivateFile, new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
