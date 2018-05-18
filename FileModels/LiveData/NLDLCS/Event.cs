@@ -1,5 +1,4 @@
-﻿using Matrix.Enums;
-using System;
+﻿using System;
 
 namespace Matrix.FileModels.LiveData.NLDLCS
 {
@@ -41,6 +40,6 @@ namespace Matrix.FileModels.LiveData.NLDLCS
             }
         }
 
-        public DataType DataType => DataType.Image;
+        public bool IsValid => Display != null;
     }
 }

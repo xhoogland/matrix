@@ -5,8 +5,4 @@
     <RootNamespace>Matrix.Interfaces</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Enums\Enums.csproj" />
-  </ItemGroup>
-
 </Project>

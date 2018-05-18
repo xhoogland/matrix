@@ -55,10 +55,10 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
 var map;
 var points = new Map();
 var liveVmsList = [];
-const ShownTypes = {
-    BOTH: 0,
-    MATRIX: 1,
-    DRIP: 2,
+const ShownType = {
+    Both: 0,
+    Matrix: 1,
+    Drip: 2,
 };
 function initMap() {
 	var mapValues = {
@@ -153,7 +153,7 @@ function initMap() {
         points.forEach(function (point) {
             if ((point.marker.position.lat() > map.getBounds().f.b && point.marker.position.lat() < map.getBounds().f.f)
                 && (point.marker.position.lng() > map.getBounds().b.b && point.marker.position.lng() < map.getBounds().b.f)
-                && map.zoom > 13//) {
+                && map.zoom > 13
 			    && pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
                 if (!point.isVisible) {
                     point.marker.setMap(map);
@@ -176,13 +176,13 @@ function initMap() {
 }
 
 function pointShouldBeVisible(dropdownValue, pointType) {
-    if (dropdownValue == ShownTypes.BOTH)
+    if (dropdownValue == ShownType.Both)
         return true;
 
-    if (dropdownValue == ShownTypes.MATRIX && pointType)
+    if (dropdownValue == ShownType.Matrix && pointType)
         return true;
 
-    if (dropdownValue == ShownTypes.DRIP && !pointType)
+    if (dropdownValue == ShownType.Drip && !pointType)
         return true;
 
     return false;
@@ -244,13 +244,33 @@ function updateLiveMatrixImage(infoWindowContent) {
 	var html = document.createElement('div');
 	html.innerHTML = infoWindowContent;
 	var imgList = Array.from(html.getElementsByTagName('img'));
+	var divList = Array.from(html.getElementsByTagName('div'));
 	imgList.forEach(function (imgTag) {
         var element = document.getElementById(imgTag.id);
-		var imageSource = liveVmsList[imgTag.id];
 		if (element.getAttribute('data-islanespecific') == 'true')
-			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + imageSource + '.png');
-		else
-			element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + liveVmsList[imgTag.id]);
+			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + liveVmsList[imgTag.id] + '.png');
+		else {
+			if (liveVmsList[imgTag.id] == imgTag.id)
+				element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + liveVmsList[imgTag.id]);
+			else {
+				var divElement = null;
+				if (element.tagName.toLowerCase() == 'img') {					
+				    divElement = document.createElement('div');
+				    divElement.setAttribute('title', element.getAttribute('title'));
+				    divElement.setAttribute('id', element.getAttribute('id'));
+				    divElement.setAttribute('data-islanespecific', element.getAttribute('data-islanespecific'));
+				    divElement.setAttribute('data-country', element.getAttribute('data-country'));
+				    divElement.setAttribute('class', 'textVms');
+				    element.parentNode.replaceChild(divElement, element);
+				}
+				else {
+					divElement = element;
+				}
+				
+				if(liveVmsList[imgTag.id])
+					divElement.innerHTML = liveVmsList[imgTag.id];
+			}
+		}
 	});
 }
 

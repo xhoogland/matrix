@@ -1,5 +1,4 @@
-﻿using Matrix.Enums;
-using Matrix.Interfaces;
+﻿using Matrix.Interfaces;
 using Matrix.SpecificImplementations;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
@@ -52,28 +51,27 @@ namespace LiveDataGenerator
             foreach (var liveObject in allLiveData)
             {
                 var sign = string.Empty;
-                switch(liveObject.DataType)
+                if (!liveObject.IsValid)
+                    continue;
+                else
                 {
-                    case DataType.Image:
+                    var prefix = "TP|";
+                    if (liveObject.Sign.StartsWith(prefix))
                     {
-                        sign = liveObject.Sign;
-                        break;
+                        sign = liveObject.Sign.Remove(0, prefix.Length);
                     }
-                    case DataType.Base64:
+                    else
                     {
-                        var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
-                        File.WriteAllBytes(fullPath, Convert.FromBase64String(liveObject.Sign));
-                        sign = liveObject.Id;
-                        break;
-                    }
-                    case DataType.TextPage:
-                    {
-                        sign = liveObject.Sign.Replace("|", "\r\n");
-                        break;
-                    }
-                    default:
-                    {
-                        continue;
+                        if(liveObject.Sign.Length > 35)
+                        {
+                            var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
+                            File.WriteAllBytes(fullPath, Convert.FromBase64String(liveObject.Sign));
+                            sign = liveObject.Id;
+                        }
+                        else
+                        {
+                            sign = liveObject.Sign;
+                        }
                     }
                 }
 

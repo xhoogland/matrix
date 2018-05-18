@@ -1,5 +1,4 @@
-﻿using Matrix.Enums;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,24 +30,23 @@ namespace Matrix.FileModels.LiveData.NLDVMS
             }
         }
 
-        public DataType DataType
+        public bool IsValid
         {
             get
             {
                 var vme = Vms.vms.VmsMessage.vmsMessage.VmsMessageExtension;
-                if (vme != null && vme.vmsMessageExtension.VmsImage.ImageData.Binary != null)
-                    return DataType.Base64;
+                if ((vme != null && vme.vmsMessageExtension.VmsImage.ImageData.Binary != null) ||
+                    Vms.vms.VmsMessage.vmsMessage.TextPage != null)
+                    return true;
 
-                if (Vms.vms.VmsMessage.vmsMessage.TextPage != null)
-                    return DataType.TextPage;
-
-                return DataType.Unknown;
+                return false;
             }
         }
 
         private string FormatLinesForParser(IEnumerable<VmsTextLine> vmsTextLineList)
         {
-            var result = new StringBuilder();
+            var result = new StringBuilder("TP|");
+            var seperator = "<br />";
 
             foreach (var line in vmsTextLineList)
             {
@@ -56,10 +54,31 @@ namespace Matrix.FileModels.LiveData.NLDVMS
                 if (vmsTextLine == null)
                     vmsTextLine = ".";
 
-                result.AppendFormat("{0}|", vmsTextLine);
+                result.AppendFormat("{0}{1}", ChangeSpecialCharactersToHtmlEntityEmoji(vmsTextLine), seperator);
             }
 
-            return result.ToString().TrimEnd('|');
+            return result.ToString().Remove(result.Length - seperator.Length, seperator.Length);
+        }
+
+        private string ChangeSpecialCharactersToHtmlEntityEmoji(string vmsTextLine)
+        {
+            var specialCharactersToReplace = new Dictionary<string, string>
+            {
+                { "%s134", "&#11014;" },
+                { "%s136", "&#8599;" },
+                { "%s137", "&#11014;" },
+                { "%s139", "&#8599;" },
+                { "¡", "&#10035;" },
+                { "£", "&#128119;" }
+            };
+
+            var result = vmsTextLine;
+            foreach (var specialChar in specialCharactersToReplace)
+            {
+                result = result.Replace(specialChar.Key, specialChar.Value);
+            }
+
+            return result;
         }
     }
 }
