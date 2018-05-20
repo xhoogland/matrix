@@ -24,7 +24,20 @@ namespace Matrix.FileModels.Locations.NLDVMS
             Y = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
         };
 
-        public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Text.Split(' ')[1];
+        public string RoadName
+        {
+            get
+            {
+                var textSplit = VmsRecord.VmsRecord.VmsDescription.Values.Value.Text.Split(' ');
+                if (textSplit.Length <= 0)
+                    return null;
+
+                if (textSplit.Length == 1)
+                    return textSplit[0];
+
+                return textSplit[1];
+            }
+        }
 
         public string RoadSide => null;
 

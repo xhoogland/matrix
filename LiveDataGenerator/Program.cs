@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace LiveDataGenerator
@@ -26,9 +27,11 @@ namespace LiveDataGenerator
             serviceHandler.WriteJsonFile(json, "liveData.json");
         }
 
+        // TODO: Deduplicate!
         private static void DownloadDataForImport(IList<LiveDataParser> liveDataParsers)
         {
-            Directory.CreateDirectory("Import");
+            var importDirectory = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Import");
+            Directory.CreateDirectory(importDirectory);
             foreach (var liveDataParser in liveDataParsers)
             {
                 liveDataParser.DownloadImportableFile();

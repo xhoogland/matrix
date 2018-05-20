@@ -11,6 +11,7 @@ namespace Matrix.SpecificImplementations
 {
     public class ServiceHandler<TParserInterface>
     {
+        private readonly string _currentDirectory;
         private readonly Config _config;
 
         public JsonSerializerSettings JsonConfig { get; }
@@ -19,6 +20,7 @@ namespace Matrix.SpecificImplementations
 
         public ServiceHandler()
         {
+            _currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
             _config = GetConfig();
             JsonConfig = new JsonSerializerSettings
             {
@@ -29,9 +31,8 @@ namespace Matrix.SpecificImplementations
 
         private Config GetConfig()
         {
-            var currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
-            var configFile = JObject.Parse(File.ReadAllText(Path.Combine(currentDirectory, "config.json")));
-            var configPrivateFile = JObject.Parse(File.ReadAllText(Path.Combine(currentDirectory, "config.private.json")));
+            var configFile = JObject.Parse(File.ReadAllText(Path.Combine(_currentDirectory, "config.json")));
+            var configPrivateFile = JObject.Parse(File.ReadAllText(Path.Combine(_currentDirectory, "config.private.json")));
             configFile.Merge(configPrivateFile, new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
@@ -54,10 +55,13 @@ namespace Matrix.SpecificImplementations
         {
             var flProperties = _config.SaveFileName.GetType().GetProperties();
             var dlProperties = _config.DownloadUrl.GetType().GetProperties();
+
             bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
             var flProperty = flProperties.First(p => getPropertyByType(type, p));
             var dlProperty = flProperties.First(p => getPropertyByType(type, p));
-            var filePath = Path.Combine("Import", flProperty.GetValue(_config.SaveFileName).ToString());
+
+            var filePath = Path.Combine(_currentDirectory, "Import", flProperty.GetValue(_config.SaveFileName).ToString());
+
             var downloadUrl = flProperty.GetValue(_config.DownloadUrl);
             if (downloadUrl != null)
                 downloadUrl = downloadUrl.ToString();
