@@ -251,7 +251,7 @@ function updateLiveMatrixImage(infoWindowContent) {
 			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + liveVmsList[imgTag.id] + '.png');
 		else {
 			if (liveVmsList[imgTag.id] == imgTag.id)
-				element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + liveVmsList[imgTag.id]);
+				element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
 			else {
 				var divElement = null;
 				if (element.tagName.toLowerCase() == 'img') {					
@@ -292,7 +292,7 @@ function getParamByName(name) {
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-document.addEventListener('DOMContentLoaded',function() {
+window.addEventListener('load',function() {
     document.querySelector('select[name="typeShown"]').onchange = onTypeShownChanged;
 }, false);
 

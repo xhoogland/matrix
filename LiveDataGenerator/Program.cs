@@ -13,9 +13,12 @@ namespace LiveDataGenerator
 {
     class Program
     {
+        private static string SavePath;
+
         static void Main(string[] args)
         {
             var serviceHandler = new ServiceHandler<LiveDataParser>();
+            SavePath = serviceHandler.SavePath;
 
             var liveDataParsers = serviceHandler.GetParserImplementations();
 
@@ -51,6 +54,15 @@ namespace LiveDataGenerator
             var liveDataWhenAll = await Task.WhenAll(retrieveLiveDataTasks);
             var allLiveData = liveDataWhenAll.SelectMany(result => result);
             var liveDataList = new List<VariableMessageSign>();
+
+            var fullJsonPath = Path.Combine(SavePath, "liveData.json");
+            IEnumerable<VariableMessageSign> currentJson = new List<VariableMessageSign>();
+            if (File.Exists(fullJsonPath))
+            {
+                var jsonFile = await File.ReadAllTextAsync(fullJsonPath);
+                currentJson = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSign>>(jsonFile);
+            }
+
             foreach (var liveObject in allLiveData)
             {
                 var sign = string.Empty;
@@ -67,13 +79,13 @@ namespace LiveDataGenerator
                     {
                         if (liveObject.Sign.Length > 35)
                         {
-                            var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
-                            var previousModification = File.GetLastWriteTimeUtc(fullPath);
-                            if (previousModification != liveObject.LastModification) {
-                                await File.WriteAllBytesAsync(fullPath, Convert.FromBase64String(liveObject.Sign));
-                                File.SetLastWriteTimeUtc(fullPath, liveObject.LastModification);
-                            }
-                            sign = liveObject.Id;
+                            var fullFilePath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
+                            var oldObject = currentJson.FirstOrDefault(v => v.Id == liveObject.Id);
+                            var base64SignLength = liveObject.Sign.Length.ToString();
+                            if (oldObject == null || oldObject.Sign != base64SignLength)
+                                await File.WriteAllBytesAsync(fullFilePath, Convert.FromBase64String(liveObject.Sign));
+
+                            sign = base64SignLength;
                         }
                         else
                         {
