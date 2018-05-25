@@ -52,7 +52,7 @@ namespace Matrix.FileModels.LiveData.NLDVMS
             {
                 var vmsTextLine = line.vmsTextLine.VmsTextLine;
                 if (vmsTextLine == null)
-                    vmsTextLine = ".";
+                    vmsTextLine = string.Empty;
 
                 result.AppendFormat("{0}{1}", ChangeSpecialCharactersToHtmlEntityEmoji(vmsTextLine), seperator);
             }
