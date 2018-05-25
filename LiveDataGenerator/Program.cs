@@ -65,10 +65,14 @@ namespace LiveDataGenerator
                     }
                     else
                     {
-                        if(liveObject.Sign.Length > 35)
+                        if (liveObject.Sign.Length > 35)
                         {
                             var fullPath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
-                            File.WriteAllBytes(fullPath, Convert.FromBase64String(liveObject.Sign));
+                            var previousModification = File.GetLastWriteTimeUtc(fullPath);
+                            if (previousModification != liveObject.LastModification) {
+                                await File.WriteAllBytesAsync(fullPath, Convert.FromBase64String(liveObject.Sign));
+                                File.SetLastWriteTimeUtc(fullPath, liveObject.LastModification);
+                            }
                             sign = liveObject.Id;
                         }
                         else

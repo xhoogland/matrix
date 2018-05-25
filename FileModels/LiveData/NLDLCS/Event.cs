@@ -41,5 +41,7 @@ namespace Matrix.FileModels.LiveData.NLDLCS
         }
 
         public bool IsValid => Display != null;
+
+        public DateTime LastModification => TsState;
     }
 }

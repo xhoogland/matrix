@@ -11,7 +11,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
 
         public VmsRecordVmsRecord VmsRecord { get; set; }
 
-        public byte Version { get; set; }
+        public ushort Version { get; set; }
 
         public bool HasCoordinates => VmsRecord.VmsRecord.VmsLocation != null &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay != null &&
@@ -24,20 +24,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
             Y = VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude
         };
 
-        public string RoadName
-        {
-            get
-            {
-                var textSplit = VmsRecord.VmsRecord.VmsDescription.Values.Value.Text.Split(' ');
-                if (textSplit.Length <= 0)
-                    return null;
-
-                if (textSplit.Length == 1)
-                    return textSplit[0];
-
-                return textSplit[1];
-            }
-        }
+        public string RoadName => VmsRecord.VmsRecord.VmsDescription.Values.Value.Text;
 
         public string RoadSide => null;
 

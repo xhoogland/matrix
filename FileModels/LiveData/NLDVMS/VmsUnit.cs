@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -43,6 +44,8 @@ namespace Matrix.FileModels.LiveData.NLDVMS
             }
         }
 
+        public DateTime LastModification => Vms.vms.VmsMessage.vmsMessage.TimeLastSet;
+
         private string FormatLinesForParser(IEnumerable<VmsTextLine> vmsTextLineList)
         {
             var result = new StringBuilder("TP|");
@@ -67,9 +70,12 @@ namespace Matrix.FileModels.LiveData.NLDVMS
                 { "%s134", "&#11014;" },
                 { "%s136", "&#8599;" },
                 { "%s137", "&#11014;" },
+                { "%s138", "&#11014;" },
                 { "%s139", "&#8599;" },
                 { "¡", "&#10035;" },
-                { "£", "&#128119;" }
+                { "£", "&#128119;" },
+                { "º", "&#127359;" },
+                { "¥", "&#11014;" }
             };
 
             var result = vmsTextLine;
