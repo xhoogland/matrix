@@ -240,6 +240,13 @@ function loadLiveMatrixInfo (firstLoad) {
 	});
 }
 
+function isInteger(value) {
+    if (/^(\-|\+)?([0-9]+|Infinity)$/.test(value))
+        return true;
+
+    return false;
+}
+
 function updateLiveMatrixImage(infoWindowContent) {
 	var html = document.createElement('div');
 	html.innerHTML = infoWindowContent;
@@ -247,10 +254,12 @@ function updateLiveMatrixImage(infoWindowContent) {
 	var divList = Array.from(html.getElementsByTagName('div'));
 	imgList.forEach(function (imgTag) {
         var element = document.getElementById(imgTag.id);
-		if (element.getAttribute('data-islanespecific') == 'true')
-			element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + liveVmsList[imgTag.id] + '.png');
-		else {
-			if (liveVmsList[imgTag.id] == imgTag.id)
+        if (element.getAttribute('data-islanespecific') == 'true') {
+            var shownSign = !liveVmsList[imgTag.id] ? 'unknown' : liveVmsList[imgTag.id];
+            element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + shownSign + '.png');
+        }
+        else {
+            if (isInteger(liveVmsList[imgTag.id]))
 				element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
 			else {
 				var divElement = null;

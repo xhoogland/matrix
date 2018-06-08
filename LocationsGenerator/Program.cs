@@ -14,7 +14,7 @@ namespace Matrix.LocationsGenerator
     {
         private static void Main(string[] args)
         {
-            var serviceHandler = new ServiceHandler<LocationParser>();
+            var serviceHandler = new ServiceHandler<LocationParser>(TypeNameHandling.Auto);
 
             var locationParsers = serviceHandler.GetParserImplementations();
 

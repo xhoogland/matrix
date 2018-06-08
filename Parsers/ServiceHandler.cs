@@ -18,13 +18,14 @@ namespace Matrix.SpecificImplementations
 
         public string SavePath { get; }
 
-        public ServiceHandler()
+        public ServiceHandler(TypeNameHandling typeNameHandling = TypeNameHandling.None)
         {
             _currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
             _config = GetConfig();
             JsonConfig = new JsonSerializerSettings
             {
-                NullValueHandling = NullValueHandling.Ignore
+                NullValueHandling = NullValueHandling.Ignore,
+                TypeNameHandling = typeNameHandling
             };
             SavePath = Path.Combine(_config.StartPath, _config.DataPath);
         }
