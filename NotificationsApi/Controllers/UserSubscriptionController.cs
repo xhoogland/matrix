@@ -33,7 +33,7 @@ namespace Matrix.NotificationsApi.Controllers
             {
                 TypeNameHandling = TypeNameHandling.Auto
             };
-            var locationsFile = await IoFile.ReadAllTextAsync(Path.Combine(_locationsPath, "locations.json"));
+            var locationsFile = await IoFile.ReadAllTextAsync(_locationsPath);
             var locations = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSignPortal>>(locationsFile, settings);
             var chosenRoadWay = locations.SelectMany(l => l.RoadWays).FirstOrDefault(r => r.HmLocation == notificationSubscription.HmLocation);
 
@@ -59,8 +59,7 @@ namespace Matrix.NotificationsApi.Controllers
 
             await IoFile.WriteAllTextAsync(_userSubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions));
 
-            var uri = string.Format("{0}{1}", HttpContext.Request.Host, HttpContext.Request.Path);
-            return Created(new Uri(uri), chosenRoadWay.HmLocation);
+            return Created(new Uri("http://place.holder"), chosenRoadWay.HmLocation);
         }
 
         // DELETE api/usersubscription
@@ -108,7 +107,7 @@ namespace Matrix.NotificationsApi.Controllers
                 config.LocationsPath = Path.Combine("..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.0");
 
             paths.Add(Path.Combine(config.StartPath, config.DataPath, "userSubscriptions.json"));
-            paths.Add(Path.Combine(config.StartPath, config.LocationsPath));
+            paths.Add(Path.Combine(config.StartPath, config.LocationsPath, "locations.json"));
 
             return paths;
         }

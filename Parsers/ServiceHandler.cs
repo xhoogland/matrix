@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,6 +21,9 @@ namespace Matrix.SpecificImplementations
 
         public ServiceHandler(TypeNameHandling typeNameHandling = TypeNameHandling.None)
         {
+            var cultureInfo = new CultureInfo("nl-NL");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            
             _currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
             _config = GetConfig();
             JsonConfig = new JsonSerializerSettings
