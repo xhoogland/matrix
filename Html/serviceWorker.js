@@ -1,4 +1,4 @@
-self.addEventListener('push', function(event) {
+self.addEventListener('push', function (event) {
     const notification = JSON.parse(event.data.text());
     const title = notification.hmLocation;
     const options = {};
