@@ -11,9 +11,9 @@ function loadJson(url, callback) {
 	request.send();  
 }
 
-function post(url, data, callback) {
+function sendRequest(type, url, data, callback) {
 	var request = new XMLHttpRequest();
-	request.open('POST', url, true);
+	request.open(type, url, true);
 	request.setRequestHeader('Content-Type', 'application/json');
     request.onreadystatechange = function () {
         if (callback && this.readyState == XMLHttpRequest.DONE)
@@ -337,7 +337,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 	//alert('Helaas, je browser ondersteunt geen Web Push Notifications. Probeer het eens in Chrome? Neem anders contact op met de ontwikkelaar!');
 }
 
-const applicationServerPublicKey = 'BOPhcWmoRn0wpBvBPTzDrFzIyH4IZ62olqNnl1ZVGMCDh8UEZuydKTkrlh89ZaHVCzZPnjlKdEZH4Q88hC1Wrps';
+const applicationServerPublicKey = 'BKQ2I-qO65hsUIBP4LVi2XeRMjlmy14emd5otLd2J1QaSmaEfiMsgugTezZrkZR3y4xx9KnTsInYf730bUDT5cM';
 
 function addRoadWayHmLocationForSubscription(hmLocation) {
 	const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
@@ -363,38 +363,50 @@ function deleteRoadWayHmLocationForSubscription(hmLocation) {
 
 function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
 	const data = {
-		subscription: btoa(JSON.stringify(subscription)),
+		pushSubscription: subscription,
 		hmLocation: hmLocation
 	};
-    
-    let addText = 'Je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging van een matrixbord krijg je weer een nieuwe notificatie!';
-	post('api/Subscription/addRoadWayHmLocation.php', data, function (statusCode) {
-        if (statusCode != 200)
+    let addText = '';
+	
+    sendRequest('POST', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+        if (statusCode == 201)
+        {
+            addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging van een matrixbord krijg je weer een nieuwe notificatie!';
+        }
+        else if (statusCode == 204)
+        {
+            addText = 'Interessant, je hebt al notificaties ingeschakeld voor ' + hmLocation + '. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
+        }       
+        else
+        {
             addText = 'Helaas, er is iets mis gegaan met notificaties inschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
-        
+        }
+
         alert (addText);
     });
 }
 
 function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
 	const data = {
-		subscription: btoa(JSON.stringify(subscription)),
+		pushSubscription: subscription,
 		hmLocation: hmLocation
 	};
-    let deleteText = 'We hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
+    let deleteText = '';
     
-	post('api/Subscription/deleteRoadWayHmLocation.php', data, function (statusCode) {
-        if (statusCode != 200)
+	sendRequest('DELETE', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+        if (statusCode == 200)
         {
-            if (statusCode == 204)
-            {
-                subscription.unsubscribe();
-                //deleteText = deleteText + ' Bij een nieuwe locatie zul je weer opnieuw de notificaties moeten toestaan.';
-            }
-            else
-            {
-                deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
-            }
+            subscription.unsubscribe();
+            deleteText = 'Begrijpelijk, we hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
+        }
+        else if (statusCode == 204)
+        {
+            subscription.unsubscribe();
+            deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en andere locaties.';
+        }
+        else
+        {
+            deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
         }
         
         alert(deleteText);
