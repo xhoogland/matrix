@@ -92,6 +92,12 @@ namespace Matrix.NotificationsApi.Controllers
             return Ok();
         }
 
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            return Ok();
+        }
+
         private IEnumerable<string> GetPaths()
         {
             var paths = new List<string>();
