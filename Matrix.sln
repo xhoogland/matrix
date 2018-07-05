@@ -24,7 +24,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Html", "Html\Html.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiveDataGenerator", "LiveDataGenerator\LiveDataGenerator.csproj", "{CE45D1A2-F1F9-409E-AAF7-8C04BF137AA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationsApi", "NotificationsApi\NotificationsApi.csproj", "{6D8134EB-23E5-4133-8F2E-4060C58932CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationsApi", "NotificationsApi\NotificationsApi.csproj", "{6D8134EB-23E5-4133-8F2E-4060C58932CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationHandler", "NotificationHandler\NotificationHandler.csproj", "{4A4506EB-DC57-4442-978C-206606568BC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{6D8134EB-23E5-4133-8F2E-4060C58932CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D8134EB-23E5-4133-8F2E-4060C58932CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D8134EB-23E5-4133-8F2E-4060C58932CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A4506EB-DC57-4442-978C-206606568BC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A4506EB-DC57-4442-978C-206606568BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A4506EB-DC57-4442-978C-206606568BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A4506EB-DC57-4442-978C-206606568BC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,9 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using IoFile = System.IO.File;
 
@@ -16,13 +14,11 @@ namespace Matrix.NotificationsApi.Controllers
     [Route("api/usersubscription")]
     public class UserSubscriptionController : Controller
     {
-        private readonly string _userSubscriptionsPath;
-        private readonly string _locationsPath;
+        private readonly Config _config;
 
         public UserSubscriptionController()
         {
-            _userSubscriptionsPath = GetPaths().First();
-            _locationsPath = GetPaths().Last();
+            _config = Startup.GetConfig();
         }
 
         // POST api/usersubscription
@@ -33,9 +29,15 @@ namespace Matrix.NotificationsApi.Controllers
             {
                 TypeNameHandling = TypeNameHandling.Auto
             };
-            var locationsFile = await IoFile.ReadAllTextAsync(_locationsPath);
+            var locationsFile = await IoFile.ReadAllTextAsync(_config.LocationsPath);
             var locations = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSignPortal>>(locationsFile, settings);
-            var chosenRoadWay = locations.SelectMany(l => l.RoadWays).FirstOrDefault(r => r.HmLocation == notificationSubscription.HmLocation);
+            var roadWay = locations.SelectMany(l => l.RoadWays).FirstOrDefault(r => r.HmLocation == notificationSubscription.HmLocation);
+            var chosenRoadWay = new PushRoadWay
+            {
+                Coordinates = locations.FirstOrDefault(l => l.RoadWays.Contains(roadWay)).Coordinates,
+                HmLocation = roadWay.HmLocation,
+                VariableMessageSigns = roadWay.VariableMessageSigns
+            };
 
             var userSubscriptions = await GetPushUserSubscriptionsFromFile(notificationSubscription);
             var subscription = userSubscriptions.FirstOrDefault(u => JsonConvert.SerializeObject(u.PushSubscription) == JsonConvert.SerializeObject(notificationSubscription.PushSubscription));
@@ -57,7 +59,10 @@ namespace Matrix.NotificationsApi.Controllers
                 return NoContent();
             }
 
-            await IoFile.WriteAllTextAsync(_userSubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions));
+            await IoFile.WriteAllTextAsync(_config.SubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            }));
 
             return Created(new Uri("http://place.holder"), chosenRoadWay.HmLocation);
         }
@@ -87,7 +92,10 @@ namespace Matrix.NotificationsApi.Controllers
                 userSubscriptions = userSubscriptions.Where(u => JsonConvert.SerializeObject(u.PushSubscription) != JsonConvert.SerializeObject(notificationSubscription.PushSubscription)).ToList();
             }
 
-            await IoFile.WriteAllTextAsync(_userSubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions));
+            await IoFile.WriteAllTextAsync(_config.SubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            }));
 
             return Ok();
         }
@@ -98,33 +106,16 @@ namespace Matrix.NotificationsApi.Controllers
             return Ok();
         }
 
-        private IEnumerable<string> GetPaths()
-        {
-            var paths = new List<string>();
-
-            var currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
-            var configFile = IoFile.ReadAllText(Path.Combine(currentDirectory, "config.json"));
-            var config = JsonConvert.DeserializeObject<Config>(configFile);
-            if (config.StartPath.StartsWith("__") && config.StartPath.EndsWith("__"))
-                config.StartPath = Directory.GetCurrentDirectory();
-            if (config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
-                config.DataPath = string.Empty;
-            if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
-                config.LocationsPath = Path.Combine("..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.0");
-
-            paths.Add(Path.Combine(config.StartPath, config.DataPath, "userSubscriptions.json"));
-            paths.Add(Path.Combine(config.StartPath, config.LocationsPath, "locations.json"));
-
-            return paths;
-        }
-
         private async Task<ICollection<PushUser>> GetPushUserSubscriptionsFromFile(NotificationSubscription notificationSubscription)
         {
-            var userSubscriptionsFile = await IoFile.ReadAllTextAsync(_userSubscriptionsPath);
+            var userSubscriptionsFile = await IoFile.ReadAllTextAsync(_config.SubscriptionsPath);
             ICollection<PushUser> userSubscriptions;
             try
             {
-                userSubscriptions = JsonConvert.DeserializeObject<ICollection<PushUser>>(userSubscriptionsFile);
+                userSubscriptions = JsonConvert.DeserializeObject<ICollection<PushUser>>(userSubscriptionsFile, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
             }
             catch (JsonSerializationException)
             {

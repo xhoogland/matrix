@@ -6,11 +6,11 @@ namespace Matrix.ViewModels
     {
         public PushSubscription PushSubscription { get; set; }
 
-        public IList<RoadWay> RoadWays { get; set; }
+        public IList<PushRoadWay> RoadWays { get; set; }
 
         public PushUser()
         {
-            RoadWays = new List<RoadWay>();
+            RoadWays = new List<PushRoadWay>();
         }
     }
 }

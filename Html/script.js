@@ -335,7 +335,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     //alert('Helaas, je browser ondersteunt geen Web Push Notifications. Probeer het eens in Chrome? Neem anders contact op met de ontwikkelaar!');
 }
 
-const applicationServerPublicKey = 'BKQ2I-qO65hsUIBP4LVi2XeRMjlmy14emd5otLd2J1QaSmaEfiMsgugTezZrkZR3y4xx9KnTsInYf730bUDT5cM';
+const applicationServerPublicKey = 'BOPhcWmoRn0wpBvBPTzDrFzIyH4IZ62olqNnl1ZVGMCDh8UEZuydKTkrlh89ZaHVCzZPnjlKdEZH4Q88hC1Wrps';
 
 function addRoadWayHmLocationForSubscription(hmLocation) {
     const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
@@ -345,7 +345,7 @@ function addRoadWayHmLocationForSubscription(hmLocation) {
     }).then(function (subscription) {
         subscriptionAddRoadWayHmLocation(subscription, hmLocation);
     }).catch(function (error) {
-        // TODO: Handle errors
+        console.error('addRoadWayHmLocationForSubscription: ' + error);
     });
 }
 
@@ -355,7 +355,7 @@ function deleteRoadWayHmLocationForSubscription(hmLocation) {
             if (!(subscription === null))
                 subscriptionDeleteRoadWayHmLocation(subscription, hmLocation);
         }).catch(function (error) {
-            // TODO: Handle errors
+            console.error('deleteRoadWayHmLocationForSubscription: ' + error);
         });
 }
 
@@ -395,7 +395,7 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
         }
         else if (statusCode == 204) {
             subscription.unsubscribe();
-            deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en/of andere locaties.';
+            deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en andere locaties.';
         }
         else {
             deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';

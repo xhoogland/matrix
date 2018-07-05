@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Matrix.FileModels.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.IO;
+using System.Reflection;
 
 namespace Matrix.NotificationsApi
 {
@@ -29,6 +34,28 @@ namespace Matrix.NotificationsApi
             }
 
             app.UseMvc();
+        }
+
+        public static Config GetConfig()
+        {
+            var currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+            var configFile = JObject.Parse(File.ReadAllText(Path.Combine(currentDirectory, "config.json")));
+            var configPrivateFile = JObject.Parse(File.ReadAllText(Path.Combine(currentDirectory, "config.private.json")));
+            configFile.Merge(configPrivateFile, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            });
+            var config = JsonConvert.DeserializeObject<Config>(configFile.ToString());
+            if (config.StartPath.StartsWith("__") && config.StartPath.EndsWith("__"))
+                config.StartPath = Directory.GetCurrentDirectory();
+            if (config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
+                config.DataPath = Path.Combine(config.StartPath, "..", "LiveDataGenerator", "bin", "Debug", "netcoreapp2.0");
+            if (config.SubscriptionsPath.StartsWith("__") && config.SubscriptionsPath.EndsWith("__"))
+                config.SubscriptionsPath = Path.Combine(config.StartPath, "..", "NotificationsApi");
+            if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
+                config.LocationsPath = Path.Combine(config.StartPath, "..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.0");
+
+            return config;
         }
     }
 }

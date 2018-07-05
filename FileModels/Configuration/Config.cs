@@ -11,5 +11,9 @@
         public string DataPath { get; set; }
 
         public string LocationsPath { get; set; }
+
+        public string SubscriptionsPath { get; set; }
+
+        public WebPushNotification WebPushNotification { get; set; }
     }
 }

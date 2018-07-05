@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -43,8 +42,6 @@ namespace Matrix.FileModels.LiveData.NLDVMS
                 return false;
             }
         }
-
-        public DateTime LastModification => Vms.vms.VmsMessage.vmsMessage.TimeLastSet;
 
         private string FormatLinesForParser(IEnumerable<VmsTextLine> vmsTextLineList)
         {

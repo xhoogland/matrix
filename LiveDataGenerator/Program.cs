@@ -6,19 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace LiveDataGenerator
+namespace Matrix.LiveDataGenerator
 {
     class Program
     {
-        private static string SavePath;
-
         static void Main(string[] args)
         {
             var serviceHandler = new ServiceHandler<LiveDataParser>();
-            SavePath = serviceHandler.SavePath;
 
             var liveDataParsers = serviceHandler.GetParserImplementations();
 
@@ -26,8 +25,24 @@ namespace LiveDataGenerator
 
             var liveData = FillLiveDataAsync(liveDataParsers, serviceHandler.SavePath).Result;
 
-            var json = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
-            serviceHandler.WriteJsonFile(json, "liveData.json");
+            var liveDataJson = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
+            serviceHandler.WriteJsonFile(liveDataJson, "liveData.json");
+
+            TriggerNotificationSending();
+        }
+
+        public static void TriggerNotificationSending()
+        {
+            var webRequest = WebRequest.Create("https://matrix-vnext-api.xanland.nl/api/notification");
+            webRequest.Method = "POST";
+            var bytes = Encoding.ASCII.GetBytes(string.Empty);
+
+            using (var requestStream = webRequest.GetRequestStream())
+            {
+                requestStream.Write(bytes, 0, bytes.Length);
+            }
+
+            webRequest.GetResponse();
         }
 
         // TODO: Deduplicate!
@@ -55,11 +70,11 @@ namespace LiveDataGenerator
             var allLiveData = liveDataWhenAll.SelectMany(result => result);
             var liveDataList = new List<VariableMessageSign>();
 
-            var fullJsonPath = Path.Combine(SavePath, "liveData.json");
+            var fullPath = Path.Combine(savePath, "liveData.json");
             IEnumerable<VariableMessageSign> currentJson = new List<VariableMessageSign>();
-            if (File.Exists(fullJsonPath))
+            if (File.Exists(fullPath))
             {
-                var jsonFile = await File.ReadAllTextAsync(fullJsonPath);
+                var jsonFile = await File.ReadAllTextAsync(fullPath);
                 currentJson = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSign>>(jsonFile);
             }
 

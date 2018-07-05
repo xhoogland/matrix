@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Matrix.Interfaces
+﻿namespace Matrix.Interfaces
 {
     public interface LiveData
     {
@@ -9,7 +7,5 @@ namespace Matrix.Interfaces
         string Sign { get; }
 
         bool IsValid { get; }
-
-        DateTime LastModification { get; }
     }
 }

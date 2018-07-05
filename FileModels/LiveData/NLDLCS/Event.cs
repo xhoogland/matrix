@@ -20,9 +20,6 @@ namespace Matrix.FileModels.LiveData.NLDLCS
         {
             get
             {
-                if (Display == null)
-                    return null;
-
                 if (Display.Blank != null)
                     return "blank";
                 else if (Display.LaneClosed != null)
@@ -41,7 +38,5 @@ namespace Matrix.FileModels.LiveData.NLDLCS
         }
 
         public bool IsValid => Display != null;
-
-        public DateTime LastModification => TsState;
     }
 }
