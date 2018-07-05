@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IoFile = System.IO.File;
@@ -15,10 +16,12 @@ namespace Matrix.NotificationsApi.Controllers
     public class UserSubscriptionController : Controller
     {
         private readonly Config _config;
+        private readonly string _subscriptionsPath;
 
         public UserSubscriptionController()
         {
             _config = Startup.GetConfig();
+            _subscriptionsPath = Path.Combine(_config.SubscriptionsPath, "userSubscriptions.json");
         }
 
         // POST api/usersubscription
@@ -59,7 +62,7 @@ namespace Matrix.NotificationsApi.Controllers
                 return NoContent();
             }
 
-            await IoFile.WriteAllTextAsync(_config.SubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
+            await IoFile.WriteAllTextAsync(_subscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
             }));
@@ -92,7 +95,7 @@ namespace Matrix.NotificationsApi.Controllers
                 userSubscriptions = userSubscriptions.Where(u => JsonConvert.SerializeObject(u.PushSubscription) != JsonConvert.SerializeObject(notificationSubscription.PushSubscription)).ToList();
             }
 
-            await IoFile.WriteAllTextAsync(_config.SubscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
+            await IoFile.WriteAllTextAsync(_subscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
             }));
@@ -108,7 +111,7 @@ namespace Matrix.NotificationsApi.Controllers
 
         private async Task<ICollection<PushUser>> GetPushUserSubscriptionsFromFile(NotificationSubscription notificationSubscription)
         {
-            var userSubscriptionsFile = await IoFile.ReadAllTextAsync(_config.SubscriptionsPath);
+            var userSubscriptionsFile = await IoFile.ReadAllTextAsync(_subscriptionsPath);
             ICollection<PushUser> userSubscriptions;
             try
             {
