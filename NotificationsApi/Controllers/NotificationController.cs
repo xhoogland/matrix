@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-//using System.Reflection;
 using System.Threading.Tasks;
 using IoFile = System.IO.File;
 
@@ -16,8 +15,6 @@ namespace Matrix.NotificationsApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post()
         {
-            //IoFile.AppendAllText(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "ok.log"), "started");
-
             var config = Startup.GetConfig();
             IEnumerable<VariableMessageSign> liveData = new List<VariableMessageSign>();
 

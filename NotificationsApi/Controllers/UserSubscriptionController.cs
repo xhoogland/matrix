@@ -1,5 +1,4 @@
-﻿using Matrix.FileModels.Configuration;
-using Matrix.ViewModels;
+﻿using Matrix.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -15,13 +14,14 @@ namespace Matrix.NotificationsApi.Controllers
     [Route("api/usersubscription")]
     public class UserSubscriptionController : Controller
     {
-        private readonly Config _config;
         private readonly string _subscriptionsPath;
+        private readonly string _locationsPath;
 
         public UserSubscriptionController()
         {
-            _config = Startup.GetConfig();
-            _subscriptionsPath = Path.Combine(_config.SubscriptionsPath, "userSubscriptions.json");
+            var config = Startup.GetConfig();
+            _subscriptionsPath = Path.Combine(config.SubscriptionsPath, "userSubscriptions.json");
+            _locationsPath = Path.Combine(config.LocationsPath, "locations.json");
         }
 
         // POST api/usersubscription
@@ -32,7 +32,7 @@ namespace Matrix.NotificationsApi.Controllers
             {
                 TypeNameHandling = TypeNameHandling.Auto
             };
-            var locationsFile = await IoFile.ReadAllTextAsync(_config.LocationsPath);
+            var locationsFile = await IoFile.ReadAllTextAsync(_locationsPath);
             var locations = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSignPortal>>(locationsFile, settings);
             var roadWay = locations.SelectMany(l => l.RoadWays).FirstOrDefault(r => r.HmLocation == notificationSubscription.HmLocation);
             var chosenRoadWay = new PushRoadWay
