@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using IoFile = System.IO.File;
 
 namespace Matrix.NotificationsApi.Controllers
@@ -42,7 +43,7 @@ namespace Matrix.NotificationsApi.Controllers
                 VariableMessageSigns = roadWay.VariableMessageSigns
             };
 
-            var userSubscriptions = await GetPushUserSubscriptionsFromFile(notificationSubscription);
+            var userSubscriptions = await GetPushUserSubscriptionsFromFile();
             var subscription = userSubscriptions.FirstOrDefault(u => JsonConvert.SerializeObject(u.PushSubscription) == JsonConvert.SerializeObject(notificationSubscription.PushSubscription));
             if (subscription == null)
             {
@@ -59,13 +60,10 @@ namespace Matrix.NotificationsApi.Controllers
             }
             else
             {
-                return NoContent();
+                return Conflict();
             }
 
-            await IoFile.WriteAllTextAsync(_subscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            }));
+            await WritePushUserSubscriptionsToFile(userSubscriptions);
 
             return Created(new Uri("http://place.holder"), chosenRoadWay.HmLocation);
         }
@@ -74,11 +72,11 @@ namespace Matrix.NotificationsApi.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]NotificationSubscription notificationSubscription)
         {
-            var userSubscriptions = await GetPushUserSubscriptionsFromFile(notificationSubscription);
+            var userSubscriptions = await GetPushUserSubscriptionsFromFile();
             var subscription = userSubscriptions.FirstOrDefault(u => JsonConvert.SerializeObject(u.PushSubscription) == JsonConvert.SerializeObject(notificationSubscription.PushSubscription));
             if (subscription == null)
             {
-                return NoContent();
+                return Gone();
             }
 
             if (subscription.RoadWays.Any(r => r.HmLocation == notificationSubscription.HmLocation))
@@ -87,20 +85,42 @@ namespace Matrix.NotificationsApi.Controllers
             }
             else
             {
-                return NoContent();
+                return Conflict();
             }
 
             if(!subscription.RoadWays.Any())
             {
                 userSubscriptions = userSubscriptions.Where(u => JsonConvert.SerializeObject(u.PushSubscription) != JsonConvert.SerializeObject(notificationSubscription.PushSubscription)).ToList();
+                await WritePushUserSubscriptionsToFile(userSubscriptions);
+
+                return NoContent();
             }
 
-            await IoFile.WriteAllTextAsync(_subscriptionsPath, JsonConvert.SerializeObject(userSubscriptions, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            }));
-
+            await WritePushUserSubscriptionsToFile(userSubscriptions);
             return Ok();
+        }
+
+        // GET api/usersubscription
+        [HttpGet]
+        public async Task<IActionResult> Get(string pushSubscriptionEndpoint)
+        {
+            var endpoint = HttpUtility.UrlDecode(pushSubscriptionEndpoint);
+            var pushUserSubscriptions = await GetPushUserSubscriptionsFromFile();
+            var userSubscription = pushUserSubscriptions.FirstOrDefault(p => p.PushSubscription.Endpoint == endpoint);
+            if (userSubscription == null)
+                return Gone();
+
+            var roadWays = userSubscription.RoadWays;
+            var list = new HmLocationList
+            {
+                NotificationList = roadWays.Select(k => k.HmLocation)
+            };
+            return Ok(JsonConvert.SerializeObject(list));
+        }
+
+        public class HmLocationList
+        {
+            public IEnumerable<string> NotificationList { get; set; }
         }
 
         [HttpOptions]
@@ -109,7 +129,7 @@ namespace Matrix.NotificationsApi.Controllers
             return Ok();
         }
 
-        private async Task<ICollection<PushUser>> GetPushUserSubscriptionsFromFile(NotificationSubscription notificationSubscription)
+        private async Task<ICollection<PushUser>> GetPushUserSubscriptionsFromFile()
         {
             var userSubscriptionsFile = await IoFile.ReadAllTextAsync(_subscriptionsPath);
             ICollection<PushUser> userSubscriptions;
@@ -126,6 +146,35 @@ namespace Matrix.NotificationsApi.Controllers
             }
 
             return userSubscriptions;
+        }
+
+        private async Task WritePushUserSubscriptionsToFile(ICollection<PushUser> userSubscriptions)
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            var serializedObject = JsonConvert.SerializeObject(userSubscriptions, jsonSerializerSettings);
+
+            await IoFile.WriteAllTextAsync(_subscriptionsPath, serializedObject);
+        }
+
+        /// <summary>
+        /// 409
+        /// </summary>
+        /// <returns></returns>
+        private StatusCodeResult Conflict()
+        {
+            return StatusCode(409);
+        }
+
+        /// <summary>
+        /// 410
+        /// </summary>
+        /// <returns></returns>
+        private StatusCodeResult Gone()
+        {
+            return StatusCode(410);
         }
     }
 }
