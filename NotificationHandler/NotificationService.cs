@@ -156,7 +156,7 @@ namespace Matrix.NotificationHandler
                         Icon = "images/xanland.png",
                         Body = isLaneSpecific || lastSign.StartsWith("TP|") ? body : "Klik op de afbeelding voor de volledige beeldstand.",
                         Image = isLaneSpecific ? null : image,
-                        Tag = isLaneSpecific ? null : roadWay.HmLocation,
+                        Tag = isLaneSpecific ? string.Format("{0}={1}@{2}", roadWay.HmLocation, DateTime.UtcNow.Hour, DateTime.UtcNow.Day) : roadWay.HmLocation,
                         Data = new NotificationData
                         {
                             CoordinatesUrl = roadWay.Coordinates != null ? string.Format("https://matrix-vnext.xanland.nl/?lat={0}&lon={1}&zoom=17", roadWay.Coordinates.X.ToString().Replace(',', '.'), roadWay.Coordinates.Y.ToString().Replace(',', '.')) : null,

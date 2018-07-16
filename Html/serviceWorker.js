@@ -11,7 +11,11 @@ self.addEventListener('push', function (event) {
     }
     else {
         const notification = event.data.json();
-        event.waitUntil(self.registration.showNotification(notification.title, notification));
+		for (var propertyName in notification) {
+			if (!notification[propertyName])
+				delete notification[propertyName];
+		}			
+        event.waitUntil(showNotification(notification.title, notification));
     }
 });
 
@@ -34,44 +38,25 @@ self.addEventListener('notificationclick', function (event) {
     }
 });
 
-//const showNotificationPromise = self.registration.getNotifications().then(notifications => {
-//    let currentNotification;
+function showNotification(title, currentNotification) {
+	return self.registration.getNotifications({ tag: currentNotification.tag }).then(notifications => {
+		let previousNotification;
 
-//    for (let i = 0; i < notifications.length; i++) {
-//        debugger;
-//        if (notifications[i].data && notifications[i].data.userName === userName) {
-//            currentNotification = notifications[i];
-//        }
-//    }
-
-//    return currentNotification;
-//}).then((currentNotification) => {
-//    //let notificationTitle;
-//    //const options = {
-//    //    icon: userIcon,
-//    //}
-
-//    //if (currentNotification) {
-//    //    // We have an open notification, let's do something with it.
-//    //    const messageCount = currentNotification.data.newMessageCount + 1;
-
-//    //    options.body = `You have ${messageCount} new messages from ${userName}.`;
-//    //    options.data = {
-//    //        userName: userName,
-//    //        newMessageCount: messageCount
-//    //    };
-//    //    notificationTitle = `New Messages from ${userName}`;
-
-//    //    // Remember to close the old notification.
-//    //    currentNotification.close();
-//    //} else {
-//    //    options.body = `"${userMessage}"`;
-//    //    options.data = {
-//    //        userName: userName,
-//    //        newMessageCount: 1
-//    //    };
-//    //    notificationTitle = `New Message from ${userName}`;
-//    //}
-
-//    return registration.showNotification("test", { message: "bla" });
-//});
+		const amount = notifications.length;
+		for (let i = 0; i < amount; i++) {
+			if (notifications[i].tag && notifications[i].tag === currentNotification.tag) {
+				previousNotification = notifications[i];
+			}
+		}
+		
+		return previousNotification;
+	}).then(previousNotification => {
+		if (!(!previousNotification)) {
+			const previousBody = previousNotification.body;
+			currentNotification.body += '\r' + previousBody;
+			currentNotification.renotify = true;
+		}
+		
+		return self.registration.showNotification(title, currentNotification);
+	});
+}

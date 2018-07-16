@@ -1,3 +1,15 @@
+document.getElementById('notificationList').hidden = true;
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.register('serviceWorker.js').then(function (swReg) {
+        swRegistration = swReg;
+    }).catch(function (error) {
+        // TODO: Handle errors
+    });
+} else {
+    // TODO: Handle errors
+    //alert('Helaas, je browser ondersteunt geen Web Push Notifications. Probeer het eens in Chrome? Neem anders contact op met de ontwikkelaar!');
+}
+
 function loadJson(url, callback) {
     var request = new XMLHttpRequest();
     request.overrideMimeType("application/json");
@@ -23,43 +35,59 @@ function sendRequest(type, url, data, callback) {
 }
 
 function getInfoWindowContent(country, isLaneSpecific, roadWays) {
-    var content = '';
+    let content = '';
 
     roadWays.forEach(function (roadWay) {
-        if (isLaneSpecific) {
-            content = content + '<a href="#" onclick="addRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">' + roadWay.HmLocation + '</a>';
-            content = content + ' (<a href="#" onclick="deleteRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">X</a>)<br />';
-        }
-        else {
-            content = content + roadWay.HmLocation + '<br />';
-        }
+        content = content + '<a href="#" onclick="addRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">' + roadWay.HmLocation + '</a>';
+        content = content + ' (<a href="#" onclick="deleteRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">X</a>)<br />';
 
         roadWay.VariableMessageSigns.forEach(function (vmsLane) {
-            var shownSign = 'images/' + country + '/blank.png';
-            var laneNumber = 'Rijstrook ' + vmsLane.Number;
-            if (!isLaneSpecific) {
-                shownSign = '';
-                laneNumber = 'DRIP';
-            }
+			let shownSign = 'images/' + country + '/blank.png';
+			let laneNumber = 'Rijstrook ' + vmsLane.Number;
+			if (!isLaneSpecific) {
+				shownSign = '';
+				laneNumber = 'DRIP';
+			}
 
-            content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" data-islanespecific="' + (isLaneSpecific ? 'true' : 'false') + '" data-country="' + country + '"/>&nbsp;';
-        });
+			content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" data-islanespecific="' + (isLaneSpecific ? 'true' : 'false') + '" data-country="' + country + '"/>&nbsp;';
+		});
         content = content + '<br />';
     });
 
     return content;
 }
 
-var map;
-var points = new Map();
-var liveVmsList = [];
+function fillNotificationList() {
+	swRegistration.pushManager.getSubscription().then(function (subscription) {
+		if (subscription !== null) {
+			document.getElementById('notificationList').hidden = false;
+			loadJson('https://matrix-vnext-api.xanland.nl/api/UserSubscription?pushSubscriptionEndpoint=' + encodeURI(subscription.endpoint), handleNotificationList);
+		}
+	});
+}
+
+function handleNotificationList(result) {
+	const notificationList = document.getElementById('notificationList');
+	result.NotificationList.forEach(function (notification) {
+		const option = document.createElement('option');
+		option.value = notification;
+		option.innerHTML = notification;
+		
+		notificationList.add(option);
+	});
+}
+
+let map;
+const points = new Map();
+const roadWayPoints = new Map();
+const liveVmsList = [];
 const ShownType = {
     Both: 0,
     Matrix: 1,
     Drip: 2,
 };
 function initMap() {
-    var mapValues = {
+    const mapValues = {
         lat: parseFloat(getParamByName('lat') || 52.3393958),
         lon: parseFloat(getParamByName('lon') || 5.3028748),
         zoom: parseFloat(getParamByName('zoom') || 9)
@@ -73,17 +101,20 @@ function initMap() {
     });
     map.setTilt(0);
 
-    var searchBoxInput = document.getElementById('searchBox');
-    var searchBox = new google.maps.places.SearchBox(searchBoxInput);
+    const searchBoxInput = document.getElementById('searchBox');
+    const searchBox = new google.maps.places.SearchBox(searchBoxInput);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBoxInput);
 
-    var typeShownDiv = document.getElementById('typeShown');
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(typeShownDiv);
+    const typeShown = document.getElementById('typeShown');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(typeShown);
 
-    var signsCopyGertDiv = document.getElementById('signsCopyGert');
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(signsCopyGertDiv);
+    const notificationList = document.getElementById('notificationList');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(notificationList);
 
-    var permaLinkDiv = document.getElementById('permaLink');
+    //const signsCopyGertDiv = document.getElementById('signsCopyGert');
+    //map.controls[google.maps.ControlPosition.TOP_LEFT].push(signsCopyGertDiv);
+
+    const permaLinkDiv = document.getElementById('permaLink');
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(permaLinkDiv);
 
     // Bias the SearchBox results towards current map's viewport.
@@ -91,11 +122,11 @@ function initMap() {
         searchBox.setBounds(map.getBounds());
     });
 
-    var markers = [];
+    let markers = [];
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function () {
-        var places = searchBox.getPlaces();
+        const places = searchBox.getPlaces();
 
         if (places.length == 0) {
             return;
@@ -108,13 +139,13 @@ function initMap() {
         markers = [];
 
         // For each place, get the icon, name and location.
-        var bounds = new google.maps.LatLngBounds();
+        const bounds = new google.maps.LatLngBounds();
         places.forEach(function (place) {
             if (!place.geometry) {
                 console.log("Returned place contains no geometry");
                 return;
             }
-            var icon = {
+            const icon = {
                 url: place.icon,
                 size: new google.maps.Size(71, 71),
                 origin: new google.maps.Point(0, 0),
@@ -142,35 +173,39 @@ function initMap() {
 
     loadMatrixen();
 
-    var trafficLayer = new google.maps.TrafficLayer();
+    const trafficLayer = new google.maps.TrafficLayer();
     trafficLayer.setMap(map);
 
     google.maps.event.addListener(map, 'idle', function () {
-        const typeShownSelect = document.getElementById('typeShown');
-        const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
-        points.forEach(function (point) {
-            if ((point.marker.position.lat() > map.getBounds().f.b && point.marker.position.lat() < map.getBounds().f.f)
-                && (point.marker.position.lng() > map.getBounds().b.b && point.marker.position.lng() < map.getBounds().b.f)
-                && map.zoom > 13
-                && pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
-                if (!point.isVisible) {
-                    point.marker.setMap(map);
-                    point.infoWindow.open(map, point.marker);
-                    point.updateLiveMatrixImage(point.infoWindow.getContent());
-                    point.isVisible = true;
-                }
-            }
-            else {
-                if (point.isVisible) {
-                    point.infoWindow.close();
-                    point.marker.setMap(null)
-                    point.isVisible = false;
-                }
-            }
-        });
+        points.forEach(placePointOnMap);
 
         updatePermaLinkAnchorHref();
     });
+	
+	setTimeout(fillNotificationList, 1000);
+}
+
+function placePointOnMap(point) {
+	const typeShownSelect = document.getElementById('typeShown');
+	const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
+	if ((point.marker.position.lat() > map.getBounds().f.b && point.marker.position.lat() < map.getBounds().f.f)
+		&& (point.marker.position.lng() > map.getBounds().b.b && point.marker.position.lng() < map.getBounds().b.f)
+		&& map.zoom > 13
+		&& pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
+		if (!point.isVisible) {
+			point.marker.setMap(map);
+			point.infoWindow.open(map, point.marker);
+			point.updateLiveMatrixImage(point.infoWindow.getContent());
+			point.isVisible = true;
+		}
+	}
+	else {
+		if (point.isVisible) {
+			point.infoWindow.close();
+			point.marker.setMap(null)
+			point.isVisible = false;
+		}
+	}
 }
 
 function pointShouldBeVisible(dropdownValue, pointType) {
@@ -188,15 +223,15 @@ function pointShouldBeVisible(dropdownValue, pointType) {
 
 function loadMatrixen() {
     loadStaticMatrixen();
-    setInterval(loadLiveMatrixInfo, 1001 * 60 * 2);
+    setInterval(loadLiveMatrixInfo, 1001 * 60);
 }
 
 function loadStaticMatrixen() {
-    loadJson('static/locations.json?1525899901', function (locations) {
+    loadJson('static/locations.json?1530906071', function (locations) {
         locations.forEach(function (location) {
-            var coordinate = location.Coordinates.X + '_' + location.Coordinates.Y;
+            const coordinate = location.Coordinates.X + '_' + location.Coordinates.Y;
             if (!points.has(coordinate)) {
-                var point = {};
+                const point = {};
                 point.marker = new google.maps.Marker({
                     position: new google.maps.LatLng(location.Coordinates.X, location.Coordinates.Y),
                     title: location.Coordinates.X + ', ' + location.Coordinates.Y
@@ -214,6 +249,10 @@ function loadStaticMatrixen() {
                 point.updateLiveMatrixImage = updateLiveMatrixImage;
 
                 points.set(coordinate, point);
+				
+				location.RoadWays.forEach(function (roadWay) {
+					roadWayPoints.set(roadWay.HmLocation, coordinate);
+				});
             }
         });
         loadLiveMatrixInfo(true);
@@ -246,52 +285,54 @@ function isInteger(value) {
 }
 
 function updateLiveMatrixImage(infoWindowContent) {
-    var html = document.createElement('div');
+    const html = document.createElement('div');
     html.innerHTML = infoWindowContent;
-    var imgList = Array.from(html.getElementsByTagName('img'));
-    var divList = Array.from(html.getElementsByTagName('div'));
+    const imgList = Array.from(html.getElementsByTagName('img'));
     imgList.forEach(function (imgTag) {
-        var element = document.getElementById(imgTag.id);
+        const element = document.getElementById(imgTag.id);
         if (element.getAttribute('data-islanespecific') == 'true') {
-            var shownSign = !liveVmsList[imgTag.id] ? 'unknown' : liveVmsList[imgTag.id];
+            const shownSign = !liveVmsList[imgTag.id] ? 'unknown' : liveVmsList[imgTag.id];
             element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + shownSign + '.png');
         }
         else {
-            if (isInteger(liveVmsList[imgTag.id]))
-                element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
-            else {
-                var divElement = null;
-                if (element.tagName.toLowerCase() == 'img') {
-                    divElement = document.createElement('div');
-                    divElement.setAttribute('title', element.getAttribute('title'));
-                    divElement.setAttribute('id', element.getAttribute('id'));
-                    divElement.setAttribute('data-islanespecific', element.getAttribute('data-islanespecific'));
-                    divElement.setAttribute('data-country', element.getAttribute('data-country'));
-                    divElement.setAttribute('class', 'textVms');
-                    element.parentNode.replaceChild(divElement, element);
-                }
-                else {
-                    divElement = element;
-                }
-
-                if (liveVmsList[imgTag.id])
-                    divElement.innerHTML = liveVmsList[imgTag.id];
-            }
+			updateNonLaneSpecificVms(element, imgTag);
         }
     });
 }
+function updateNonLaneSpecificVms(element, imgTag) {
+	if (isInteger(liveVmsList[imgTag.id]))
+		element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
+	else {
+		let divElement = null;
+		if (element.tagName.toLowerCase() == 'img') {
+			divElement = document.createElement('div');
+			divElement.setAttribute('title', element.getAttribute('title'));
+			divElement.setAttribute('id', element.getAttribute('id'));
+			divElement.setAttribute('data-islanespecific', element.getAttribute('data-islanespecific'));
+			divElement.setAttribute('data-country', element.getAttribute('data-country'));
+			divElement.setAttribute('class', 'textVms');
+			element.parentNode.replaceChild(divElement, element);
+		}
+		else {
+			divElement = element;
+		}
+
+		if (liveVmsList[imgTag.id])
+			divElement.innerHTML = liveVmsList[imgTag.id];
+	}
+}
 
 function updatePermaLinkAnchorHref() {
-    var plAnchor = document.getElementById('permaLinkAnchorHref');
+    const plAnchor = document.getElementById('permaLinkAnchorHref');
     plAnchor.href = '?lat=' + map.center.lat().toFixed(5) + '&lon=' + map.center.lng().toFixed(5) + '&zoom=' + map.zoom;
 }
 
 function getParamByName(name) {
     name = name.replace(/[\[\]]/g, '\\$&');
 
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
 
-    var results = regex.exec(window.location.href);
+    const results = regex.exec(window.location.href);
     if (!results || !results[2]) {
         return null;
     }
@@ -301,11 +342,29 @@ function getParamByName(name) {
 
 window.addEventListener('load', function () {
     document.querySelector('select[name="typeShown"]').onchange = onTypeShownChanged;
+    document.querySelector('select[name="notificationList"]').onchange = onNotificationListChanged;
 }, false);
 
-
 function onTypeShownChanged(event) {
-    google.maps.event.trigger(map, 'idle');
+    triggerGoogleMapsIdleEvent();
+}
+
+function onNotificationListChanged(event) {
+	const notificationListSelect = document.getElementById('notificationList');
+    const nlValue = notificationListSelect.options[notificationListSelect.selectedIndex].value.toString();
+	if (nlValue === 'Notificatielijst')
+		return;
+	
+	const coordinates = roadWayPoints.get(nlValue).split('_');
+	map.setCenter({
+		lat: parseFloat(coordinates[0]),
+		lng: parseFloat(coordinates[1])
+	});
+	map.setZoom(17);
+}
+
+function triggerGoogleMapsIdleEvent() {
+	google.maps.event.trigger(map, 'idle');
 }
 
 function urlB64ToUint8Array(base64String) {
@@ -324,25 +383,13 @@ function urlB64ToUint8Array(base64String) {
     return outputArray;
 }
 
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-    navigator.serviceWorker.register('serviceWorker.js').then(function (swReg) {
-        swRegistration = swReg;
-    }).catch(function (error) {
-        // TODO: Handle errors
-    });
-} else {
-    // TODO: Handle errors
-    //alert('Helaas, je browser ondersteunt geen Web Push Notifications. Probeer het eens in Chrome? Neem anders contact op met de ontwikkelaar!');
-}
-
-const applicationServerPublicKey = 'BOPhcWmoRn0wpBvBPTzDrFzIyH4IZ62olqNnl1ZVGMCDh8UEZuydKTkrlh89ZaHVCzZPnjlKdEZH4Q88hC1Wrps';
+const applicationServerKey = urlB64ToUint8Array('BOPhcWmoRn0wpBvBPTzDrFzIyH4IZ62olqNnl1ZVGMCDh8UEZuydKTkrlh89ZaHVCzZPnjlKdEZH4Q88hC1Wrps');
 
 function addRoadWayHmLocationForSubscription(hmLocation) {
-    const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
     swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerKey
-    }).then(function (subscription) {
+		userVisibleOnly: true,
+		applicationServerKey: applicationServerKey
+	}).then(function (subscription) {
         subscriptionAddRoadWayHmLocation(subscription, hmLocation);
     }).catch(function (error) {
         console.error('addRoadWayHmLocationForSubscription: ' + error);
@@ -350,13 +397,14 @@ function addRoadWayHmLocationForSubscription(hmLocation) {
 }
 
 function deleteRoadWayHmLocationForSubscription(hmLocation) {
-    swRegistration.pushManager.getSubscription()
-        .then(function (subscription) {
-            if (!(subscription === null))
-                subscriptionDeleteRoadWayHmLocation(subscription, hmLocation);
-        }).catch(function (error) {
-            console.error('deleteRoadWayHmLocationForSubscription: ' + error);
-        });
+    swRegistration.pushManager.subscribe({
+		userVisibleOnly: true,
+		applicationServerKey: applicationServerKey
+	}).then(function (subscription) {
+        subscriptionDeleteRoadWayHmLocation(subscription, hmLocation);
+    }).catch(function (error) {
+        console.error('deleteRoadWayHmLocationForSubscription: ' + error);
+    });
 }
 
 function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
@@ -364,13 +412,13 @@ function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
         pushSubscription: subscription,
         hmLocation: hmLocation
     };
-    let addText = '';
 
     sendRequest('POST', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+		let addText = '';
         if (statusCode == 201) {
-            addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging van een matrixbord krijg je weer een nieuwe notificatie!';
+            addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging krijg je weer een nieuwe notificatie!';
         }
-        else if (statusCode == 204) {
+        else if (statusCode == 409) {
             addText = 'Interessant, je hebt al notificaties ingeschakeld voor ' + hmLocation + '. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
         }
         else {
@@ -386,21 +434,30 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
         pushSubscription: subscription,
         hmLocation: hmLocation
     };
-    let deleteText = '';
 
     sendRequest('DELETE', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+		let deleteText = '';
         if (statusCode == 200) {
-            subscription.unsubscribe();
             deleteText = 'Begrijpelijk, we hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
         }
         else if (statusCode == 204) {
-            subscription.unsubscribe();
-            deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en andere locaties.';
+            subscription.unsubscribe().then (function (success) {
+				alert('Jammer, nu we je notificaties hebben uitgeschakeld voor ' + hmLocation + ' blijft er niks meer over. We hebben je uit ons bestand gehaald. Het is uiteraard nog steeds mogelijk om weer nieuwe notificaties in te schakelen!');
+			}).catch(function (e) {
+				console.error('subscriptionDeleteRoadWayHmLocation - statusCode == 204: ' + e);
+			});
+        }
+        else if (statusCode == 409) {
+            deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en/of andere locaties. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
+        }
+        else if (statusCode == 410) {
+            deleteText = 'Je bent niet meer bij ons bekend in het bestand met betrekking tot enige notificaties. Het is uiteraard mogelijk om weer nieuwe notificaties in te schakelen!';
         }
         else {
             deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
         }
 
-        alert(deleteText);
+		if (deleteText !== '')
+			alert(deleteText);
     });
 }

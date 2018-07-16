@@ -89,6 +89,13 @@ html, body {
     height: 31px;
 }
 
+#notificationList {
+    left: 119px !important;
+    top: 39px !important;
+    height: 31px;
+	width: 213px;
+}
+
 #signsCopyGert {
     font-family: Roboto, Arial, sans-serif;
     color: rgb(68, 68, 68);
@@ -128,6 +135,12 @@ html, body {
         top: 45px !important;
         width: 107px;
     }
+
+	#notificationList {
+		left: 117px !important;
+		top: 45px !important;
+		width: 227px;
+	}
 }
 
 .textVms {
