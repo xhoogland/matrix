@@ -53,7 +53,7 @@ function showNotification(title, currentNotification) {
 	}).then(previousNotification => {
 		if (!(!previousNotification)) {
 			const previousBody = previousNotification.body;
-			currentNotification.body += '\r' + previousBody;
+			currentNotification.body += '\n' + previousBody;
 			currentNotification.renotify = true;
 		}
 		
