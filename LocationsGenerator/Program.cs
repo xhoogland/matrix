@@ -46,7 +46,7 @@ namespace Matrix.LocationsGenerator
             }
 
             var locationsWhenAll = await Task.WhenAll(retrieveLocationsTasks);
-            var locations = locationsWhenAll.SelectMany(result => result);
+            var locations = locationsWhenAll.SelectMany(result => result).OrderBy(l => string.Format("{0} {1} {2}", l.RoadName, l.RoadSide, l.Km));
             var portals = new List<VariableMessageSignPortal>();
             foreach (var location in locations.OrderBy(l => l.Lane))
             {
