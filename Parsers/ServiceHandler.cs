@@ -18,6 +18,7 @@ namespace Matrix.SpecificImplementations
         public JsonSerializerSettings JsonConfig { get; }
 
         public string SavePath { get; }
+        public string ApiUrl { get; }
 
         public ServiceHandler(TypeNameHandling typeNameHandling = TypeNameHandling.None)
         {
@@ -32,6 +33,7 @@ namespace Matrix.SpecificImplementations
                 TypeNameHandling = typeNameHandling
             };
             SavePath = Path.Combine(_config.StartPath, _config.DataPath);
+            ApiUrl = _config.Url;
         }
 
         private Config GetConfig()
@@ -47,6 +49,8 @@ namespace Matrix.SpecificImplementations
                 config.StartPath = Directory.GetCurrentDirectory();
             if (config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
                 config.DataPath = string.Empty;
+            if (config.Url.StartsWith("__") && config.Url.EndsWith("__"))
+                config.Url = "http://localhost:52486";
 
             return config;
         }

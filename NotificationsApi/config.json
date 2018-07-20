@@ -2,5 +2,6 @@
   "StartPath": "__FullPath__",
   "DataPath": "__DataPath__",
   "SubscriptionsPath": "__SubscriptionsPath__",
-  "LocationsPath": "__LocationsPath__"
+  "LocationsPath": "__LocationsPath__",
+  "Url":  "__WebUrl__"
 }

@@ -54,6 +54,8 @@ namespace Matrix.NotificationsApi
                 config.SubscriptionsPath = Path.Combine(config.StartPath, "..", "NotificationsApi");
             if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
                 config.LocationsPath = Path.Combine(config.StartPath, "..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.0");
+            if (config.Url.StartsWith("__") && config.Url.EndsWith("__"))
+                config.Url = "https://matrix-vnext.xanland.nl";
 
             return config;
         }

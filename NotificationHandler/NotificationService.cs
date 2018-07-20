@@ -21,8 +21,9 @@ namespace Matrix.NotificationHandler
         private readonly IEnumerable<PushUser> _pushUsers;
         private readonly IEnumerable<PushUser> _lastSentNotifications;
         private readonly WebPushNotification _webPushNotificationSettings;
+        private readonly string _webUrl;
 
-        public NotificationService(IEnumerable<VariableMessageSign> liveData, string subscriptionsPath, WebPushNotification webPushNotificationSettings)
+        public NotificationService(IEnumerable<VariableMessageSign> liveData, string subscriptionsPath, WebPushNotification webPushNotificationSettings, string webUrl)
         {
             _liveData = liveData;
             _subscriptionsPath = Path.Combine(subscriptionsPath, "userSubscriptions.json");
@@ -30,6 +31,7 @@ namespace Matrix.NotificationHandler
             _pushUsers = ReadJsonFromFile<PushUser>(_subscriptionsPath).Result;
             _lastSentNotifications = ReadJsonFromFile<PushUser>(_subscriptionsPath).Result;
             _webPushNotificationSettings = webPushNotificationSettings;
+            _webUrl = webUrl;
         }
 
         public void Preprocess()
@@ -147,7 +149,7 @@ namespace Matrix.NotificationHandler
                         if (lastSign.StartsWith("TP|"))
                             body = lastSign;
                         else if (lastSign.StartsWith("live/"))
-                            image = string.Format("https://matrix-vnext.xanland.nl/{0}", lastSign);
+                            image = string.Format("{0}/{1}", _webUrl, lastSign);
                     }
 
                     var notification = new Notification
@@ -159,7 +161,7 @@ namespace Matrix.NotificationHandler
                         Tag = isLaneSpecific ? string.Format("{0}={1}@{2}", roadWay.HmLocation, DateTime.UtcNow.Hour, DateTime.UtcNow.Day) : roadWay.HmLocation,
                         Data = new NotificationData
                         {
-                            CoordinatesUrl = roadWay.Coordinates != null ? string.Format("https://matrix-vnext.xanland.nl/?lat={0}&lon={1}&zoom=17", roadWay.Coordinates.X.ToString().Replace(',', '.'), roadWay.Coordinates.Y.ToString().Replace(',', '.')) : null,
+                            CoordinatesUrl = roadWay.Coordinates != null ? string.Format("{0}/?lat={1}&lon={2}&zoom=17", _webUrl, roadWay.Coordinates.X.ToString().Replace(',', '.'), roadWay.Coordinates.Y.ToString().Replace(',', '.')) : null,
                         },
                         Actions = new List<NotificationAction>
                         {

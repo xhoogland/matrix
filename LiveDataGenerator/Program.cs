@@ -28,12 +28,12 @@ namespace Matrix.LiveDataGenerator
             var liveDataJson = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(liveDataJson, "liveData.json");
 
-            TriggerNotificationSending();
+            TriggerNotificationSending(serviceHandler.ApiUrl);
         }
 
-        public static void TriggerNotificationSending()
+        public static void TriggerNotificationSending(string apiUrl)
         {
-            var webRequest = WebRequest.Create("https://matrix-vnext-api.xanland.nl/api/notification");
+            var webRequest = WebRequest.Create(string.Format("{0}/api/notification", apiUrl));
             webRequest.Method = "POST";
             var bytes = Encoding.ASCII.GetBytes(string.Empty);
 

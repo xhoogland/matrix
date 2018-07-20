@@ -15,5 +15,7 @@
         public string SubscriptionsPath { get; set; }
 
         public WebPushNotification WebPushNotification { get; set; }
+
+        public string Url { get; set; }
     }
 }

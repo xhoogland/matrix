@@ -68,13 +68,24 @@ function fillNotificationList() {
 
 function handleNotificationList(result) {
 	const notificationList = document.getElementById('notificationList');
-	result.NotificationList.forEach(function (notification) {
-		const option = document.createElement('option');
-		option.value = notification;
-		option.innerHTML = notification;
-		
-		notificationList.add(option);
-	});
+	result.NotificationList.forEach(addOptionToNotficationList);
+}
+
+function addOptionToNotficationList (notification) {
+	const option = document.createElement('option');
+	option.value = notification;
+	option.innerHTML = notification;
+	
+	notificationList.add(option);
+}
+
+function deleteOptionFromNotficationList (notification) {
+	const notificationList = document.getElementById('notificationList');
+	const optionsAmount = notificationList.options.length;
+	for(let i = 0; i < optionsAmount; i++) {
+      if (notificationList.options[i].value == notification)
+        notificationList.remove(i);
+    }
 }
 
 let map;
@@ -417,6 +428,8 @@ function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
 		let addText = '';
         if (statusCode == 201) {
             addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging krijg je weer een nieuwe notificatie!';
+			addOptionToNotficationList(hmLocation);
+			document.getElementById('notificationList').hidden = false;
         }
         else if (statusCode == 409) {
             addText = 'Interessant, je hebt al notificaties ingeschakeld voor ' + hmLocation + '. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
@@ -439,10 +452,13 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
 		let deleteText = '';
         if (statusCode == 200) {
             deleteText = 'Begrijpelijk, we hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
+			deleteOptionFromNotficationList(hmLocation);
         }
         else if (statusCode == 204) {
             subscription.unsubscribe().then (function (success) {
 				alert('Jammer, nu we je notificaties hebben uitgeschakeld voor ' + hmLocation + ' blijft er niks meer over. We hebben je uit ons bestand gehaald. Het is uiteraard nog steeds mogelijk om weer nieuwe notificaties in te schakelen!');
+				deleteOptionFromNotficationList(hmLocation);
+				document.getElementById('notificationList').hidden = true;
 			}).catch(function (e) {
 				console.error('subscriptionDeleteRoadWayHmLocation - statusCode == 204: ' + e);
 			});
@@ -456,7 +472,7 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
         else {
             deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
         }
-
+		
 		if (deleteText !== '')
 			alert(deleteText);
     });
