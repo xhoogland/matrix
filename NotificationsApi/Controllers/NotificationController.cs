@@ -28,7 +28,7 @@ namespace Matrix.NotificationsApi.Controllers
                 });
             }
 
-            var notificationService = new NotificationService(liveData, config.SubscriptionsPath, config.WebPushNotification, _config.Url);
+            var notificationService = new NotificationService(liveData, config.SubscriptionsPath, config.WebPushNotification, config.Url);
             notificationService.Preprocess();
             await notificationService.Send();
 

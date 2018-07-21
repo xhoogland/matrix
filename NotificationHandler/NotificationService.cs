@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -177,17 +176,10 @@ namespace Matrix.NotificationHandler
                         DripShownSign = false
                     };
 
-                    try
+                    await webPushClient.SendNotificationAsync(subscription, JsonConvert.SerializeObject(notification, new JsonSerializerSettings
                     {
-                        await webPushClient.SendNotificationAsync(subscription, JsonConvert.SerializeObject(notification, new JsonSerializerSettings
-                        {
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }), vapidDetails);
-                    }
-                    catch(Exception ex)
-                    {
-                        Debugger.Break();
-                    }
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    }), vapidDetails);
                 }
             }
 
