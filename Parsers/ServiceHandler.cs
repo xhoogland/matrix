@@ -45,11 +45,11 @@ namespace Matrix.SpecificImplementations
                 MergeArrayHandling = MergeArrayHandling.Union
             });
             var config = JsonConvert.DeserializeObject<Config>(configFile.ToString());
-            if (config.StartPath.StartsWith("__") && config.StartPath.EndsWith("__"))
+            if (config.StartPath != null && config.StartPath.StartsWith("__") && config.StartPath.EndsWith("__"))
                 config.StartPath = Directory.GetCurrentDirectory();
-            if (config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
+            if (config.DataPath != null && config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
                 config.DataPath = string.Empty;
-            if (config.Url.StartsWith("__") && config.Url.EndsWith("__"))
+            if (config.Url != null && config.Url.StartsWith("__") && config.Url.EndsWith("__"))
                 config.Url = "http://localhost:52486";
 
             return config;
