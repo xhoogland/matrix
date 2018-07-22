@@ -1,3 +1,4 @@
+const config = { Url: '__ApiUrl__' };
 document.getElementById('notificationList').hidden = true;
 if ('serviceWorker' in navigator && 'PushManager' in window) {
     navigator.serviceWorker.register('serviceWorker.js').then(function (swReg) {
@@ -61,7 +62,7 @@ function fillNotificationList() {
 	swRegistration.pushManager.getSubscription().then(function (subscription) {
 		if (subscription !== null) {
 			document.getElementById('notificationList').hidden = false;
-			loadJson('https://matrix-vnext-api.xanland.nl/api/UserSubscription?pushSubscriptionEndpoint=' + encodeURI(subscription.endpoint), handleNotificationList);
+			loadJson(_config.Url + '/api/UserSubscription?pushSubscriptionEndpoint=' + encodeURI(subscription.endpoint), handleNotificationList);
 		}
 	});
 }
@@ -424,7 +425,7 @@ function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
         hmLocation: hmLocation
     };
 
-    sendRequest('POST', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+    sendRequest('POST', _config.Url + '/api/UserSubscription', data, function (statusCode) {
 		let addText = '';
         if (statusCode == 201) {
             addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging krijg je weer een nieuwe notificatie!';
@@ -448,7 +449,7 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
         hmLocation: hmLocation
     };
 
-    sendRequest('DELETE', 'https://matrix-vnext-api.xanland.nl/api/UserSubscription', data, function (statusCode) {
+    sendRequest('DELETE', _config.Url + '/api/UserSubscription', data, function (statusCode) {
 		let deleteText = '';
         if (statusCode == 200) {
             deleteText = 'Begrijpelijk, we hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
