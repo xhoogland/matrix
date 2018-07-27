@@ -176,10 +176,13 @@ namespace Matrix.NotificationHandler
                         DripShownSign = false
                     };
 
-                    await webPushClient.SendNotificationAsync(subscription, JsonConvert.SerializeObject(notification, new JsonSerializerSettings
+                    try
                     {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                    }), vapidDetails);
+                        await webPushClient.SendNotificationAsync(subscription, JsonConvert.SerializeObject(notification, new JsonSerializerSettings
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }), vapidDetails);
+                    } catch (Exception) { }
                 }
             }
 
