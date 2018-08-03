@@ -1,4 +1,4 @@
-﻿using Matrix.NotificationHandler;
+﻿using Matrix.Services;
 using Matrix.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;

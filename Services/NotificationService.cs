@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebPush;
 
-namespace Matrix.NotificationHandler
+namespace Matrix.Services
 {
     public class NotificationService
     {
@@ -50,7 +50,7 @@ namespace Matrix.NotificationHandler
         }
 
         public void PostProcess()
-        { 
+        {
             foreach (var pushUser in _lastSentNotifications)
             {
                 foreach (var roadWay in pushUser.RoadWays)
@@ -59,7 +59,7 @@ namespace Matrix.NotificationHandler
                     {
                         var id = vms.Id;
 
-                        vms.Sign =  _liveData.SingleOrDefault(l => l.Id == id).Sign;
+                        vms.Sign = _liveData.SingleOrDefault(l => l.Id == id).Sign;
                     }
                 }
             }
@@ -182,7 +182,8 @@ namespace Matrix.NotificationHandler
                         {
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         }), vapidDetails);
-                    } catch (Exception) { }
+                    }
+                    catch (Exception) { }
                 }
             }
 

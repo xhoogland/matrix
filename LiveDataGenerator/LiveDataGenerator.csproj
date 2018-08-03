@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Parsers\Parsers.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
     <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
   </ItemGroup>
 

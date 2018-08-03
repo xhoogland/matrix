@@ -9,9 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Matrix.SpecificImplementations
+namespace Matrix.Services
 {
-    public class ServiceHandler<TParserInterface> where TParserInterface : Parser
+    public class GeneratorService<TParserInterface> where TParserInterface : Parser
     {
         private readonly string _currentDirectory;
         private readonly Config _config;
@@ -21,7 +21,7 @@ namespace Matrix.SpecificImplementations
         public string SavePath { get; }
         public string ApiUrl { get; }
 
-        public ServiceHandler(TypeNameHandling typeNameHandling = TypeNameHandling.None)
+        public GeneratorService(TypeNameHandling typeNameHandling = TypeNameHandling.None)
         {
             var cultureInfo = new CultureInfo("nl-NL");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

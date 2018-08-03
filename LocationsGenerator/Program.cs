@@ -1,5 +1,5 @@
 ﻿using Matrix.Interfaces;
-using Matrix.SpecificImplementations;
+using Matrix.Services;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Matrix.LocationsGenerator
     {
         private static void Main(string[] args)
         {
-            var serviceHandler = new ServiceHandler<LocationParser>(TypeNameHandling.Auto);
+            var serviceHandler = new GeneratorService<LocationParser>(TypeNameHandling.Auto);
 
             var locationParsers = serviceHandler.GetParserImplementations();
 

@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FileModels\FileModels.csproj" />
-    <ProjectReference Include="..\NotificationHandler\NotificationHandler.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
     <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
   </ItemGroup>
 

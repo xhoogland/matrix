@@ -1,5 +1,5 @@
 ﻿using Matrix.Interfaces;
-using Matrix.SpecificImplementations;
+using Matrix.Services;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -16,7 +16,7 @@ namespace Matrix.LiveDataGenerator
     {
         static void Main(string[] args)
         {
-            var serviceHandler = new ServiceHandler<LiveDataParser>();
+            var serviceHandler = new GeneratorService<LiveDataParser>();
 
             var liveDataParsers = serviceHandler.GetParserImplementations();
 
