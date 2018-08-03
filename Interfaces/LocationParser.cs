@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 
 namespace Matrix.Interfaces
 {
-    public interface LocationParser
+    public interface LocationParser : Parser
     {
         Task<IEnumerable<Location>> RetrieveLocationsFromContent();
-
-        void DownloadImportableFile();
     }
 }

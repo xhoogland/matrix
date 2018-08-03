@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 
 namespace Matrix.Interfaces
 {
-    public interface LiveDataParser
+    public interface LiveDataParser : Parser
     {
         Task<IEnumerable<LiveData>> RetrieveLiveDataFromContent();
-
-        void DownloadImportableFile();
     }
 }

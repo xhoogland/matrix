@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,8 +19,6 @@ namespace Matrix.LiveDataGenerator
             var serviceHandler = new ServiceHandler<LiveDataParser>();
 
             var liveDataParsers = serviceHandler.GetParserImplementations();
-
-            DownloadDataForImport(liveDataParsers);
 
             var liveData = FillLiveDataAsync(liveDataParsers, serviceHandler.SavePath).Result;
 
@@ -43,17 +40,6 @@ namespace Matrix.LiveDataGenerator
             }
 
             webRequest.GetResponse();
-        }
-
-        // TODO: Deduplicate!
-        private static void DownloadDataForImport(IList<LiveDataParser> liveDataParsers)
-        {
-            var importDirectory = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Import");
-            Directory.CreateDirectory(importDirectory);
-            foreach (var liveDataParser in liveDataParsers)
-            {
-                liveDataParser.DownloadImportableFile();
-            }
         }
 
         private static async Task<List<VariableMessageSign>> FillLiveDataAsync(IList<LiveDataParser> liveDataParsers, string savePath)

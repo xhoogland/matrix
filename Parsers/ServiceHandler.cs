@@ -1,4 +1,5 @@
 ﻿using Matrix.FileModels.Configuration;
+using Matrix.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,7 +11,7 @@ using System.Reflection;
 
 namespace Matrix.SpecificImplementations
 {
-    public class ServiceHandler<TParserInterface>
+    public class ServiceHandler<TParserInterface> where TParserInterface : Parser
     {
         private readonly string _currentDirectory;
         private readonly Config _config;
@@ -24,7 +25,7 @@ namespace Matrix.SpecificImplementations
         {
             var cultureInfo = new CultureInfo("nl-NL");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            
+
             _currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
             _config = GetConfig();
             JsonConfig = new JsonSerializerSettings
@@ -82,10 +83,22 @@ namespace Matrix.SpecificImplementations
         public IList<TParserInterface> GetParserImplementations()
         {
             var interfaceImplemented = typeof(TParserInterface);
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
+            var derivedClasses = assemblies.Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+            var objectInstances = derivedClasses.Select(CreateObjectInstance).ToList();
 
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
-                          .Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                          .Select(CreateObjectInstance).ToList();
+            DownloadDataForImport(objectInstances);
+            return objectInstances;
+        }
+
+        private static void DownloadDataForImport(IList<TParserInterface> locationParsers)
+        {
+            var importDirectory = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Import");
+            Directory.CreateDirectory(importDirectory);
+            foreach (var locationParser in locationParsers)
+            {
+                locationParser.DownloadImportableFile();
+            }
         }
     }
 }

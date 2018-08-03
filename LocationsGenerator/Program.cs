@@ -3,9 +3,7 @@ using Matrix.SpecificImplementations;
 using Matrix.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Matrix.LocationsGenerator
@@ -18,23 +16,10 @@ namespace Matrix.LocationsGenerator
 
             var locationParsers = serviceHandler.GetParserImplementations();
 
-            DownloadDataForImport(locationParsers);
-
             var portalLocations = FillPortalsAsync(locationParsers).Result;
 
             var json = JsonConvert.SerializeObject(portalLocations, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(json, "locations.json");
-        }
-
-        // TODO: Deduplicate!
-        private static void DownloadDataForImport(IList<LocationParser> locationParsers)
-        {
-            var importDirectory = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Import");
-            Directory.CreateDirectory(importDirectory);
-            foreach (var locationParser in locationParsers)
-            {
-                locationParser.DownloadImportableFile();
-            }
         }
 
         private static async Task<List<VariableMessageSignPortal>> FillPortalsAsync(IList<LocationParser> locationParsers)
