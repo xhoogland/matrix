@@ -4,7 +4,7 @@
     {
         public string XsiType { get; set; }
 
-        public byte AlertCLocationCountryCode { get; set; }
+        public string AlertCLocationCountryCode { get; set; }
 
         public decimal AlertCLocationTableNumber { get; set; }
 
