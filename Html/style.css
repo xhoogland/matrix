@@ -75,25 +75,25 @@ html, body {
     text-overflow: ellipsis;
     width: 200px;
     top: 9.4px !important;
-    height: 26.2px;
-    left: 92px !important;
+    height: 37.2px;
+    left: 168px !important;
 }
 
-    #searchBox:focus {
-        border-color: #4d90fe;
-    }
+#searchBox:focus {
+    border-color: #4d90fe;
+}
 
 #typeShown {
     left: 10px !important;
-    top: 39px !important;
-    height: 31px;
+    top: 50px !important;
+    height: 40px;
 }
 
 #notificationList {
     left: 119px !important;
-    top: 39px !important;
-    height: 31px;
-	width: 213px;
+    top: 50px !important;
+    height: 40px;
+    width: 289px;
 }
 
 #signsCopyGert {
@@ -111,36 +111,28 @@ html, body {
 
 #permaLink {
     background-color: white;
-    width: 24px;
+    width: 34px;
     right: 10px !important;
-    bottom: 127px !important;
-    z-index: 1337 !important;
-    font-size: 20px;
-    padding: 2px;
+    bottom: 209px !important;
+    font-size: 28px;
+    padding: 3px;
 }
 
-    #permaLink > a {
-        color: black !important;
-        text-decoration: none !important;
-    }
+#permaLink > a {
+    color: black !important;
+    text-decoration: none !important;
+}
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
     #searchBox {
-        top: 9.5px !important;
-        height: 31.9px;
-        left: 104px !important;
+        left: 192px !important;
+        width: 120px;
     }
 
-    #typeShown {
-        top: 45px !important;
-        width: 107px;
+    #notificationList {
+        left: 114px !important;
+        width: 238px;
     }
-
-	#notificationList {
-		left: 117px !important;
-		top: 45px !important;
-		width: 227px;
-	}
 }
 
 .textVms {

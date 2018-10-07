@@ -83,9 +83,8 @@ namespace Matrix.Services
         public IList<TParserInterface> GetParserImplementations()
         {
             var interfaceImplemented = typeof(TParserInterface);
-            var currentDomain = AppDomain.CurrentDomain;
-            currentDomain.Load("Parsers");
-            var assemblies = currentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
+            Assembly.Load("Parsers");
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
             var derivedClasses = assemblies.Where(t => interfaceImplemented.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
             var objectInstances = derivedClasses.Select(CreateObjectInstance).ToList();
 
