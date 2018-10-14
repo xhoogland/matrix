@@ -66,15 +66,15 @@ namespace Matrix.Services
             var flProperties = _config.SaveFileName.GetType().GetProperties();
             var dlProperties = _config.DownloadUrl.GetType().GetProperties();
 
+            // Retrieves property in class named after specified type
             bool getPropertyByType(Type pType, PropertyInfo propertyInfo) => pType.ToString().Contains(string.Format(".{0}", propertyInfo.Name));
+
             var flProperty = flProperties.First(p => getPropertyByType(type, p));
-            var dlProperty = flProperties.First(p => getPropertyByType(type, p));
+            var dlProperty = dlProperties.First(p => getPropertyByType(type, p));
 
             var filePath = Path.Combine(_currentDirectory, "Import", flProperty.GetValue(_config.SaveFileName).ToString());
 
-            var downloadUrl = flProperty.GetValue(_config.DownloadUrl);
-            if (downloadUrl != null)
-                downloadUrl = downloadUrl.ToString();
+            var downloadUrl = dlProperty.GetValue(_config.DownloadUrl);
 
             var objectInstance = Activator.CreateInstance(type, downloadUrl, filePath);
             return (TParserInterface)objectInstance;
