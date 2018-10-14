@@ -58,7 +58,11 @@ namespace Matrix.Services
 
         public void WriteJsonFile(string json, string fileName)
         {
-            File.WriteAllText(Path.Combine(_config.StartPath, _config.DataPath, fileName), json);
+            var fullPathToFile = Path.Combine(_config.StartPath, _config.DataPath);
+            if (!Directory.Exists(fullPathToFile))
+                Directory.CreateDirectory(fullPathToFile);
+
+            File.WriteAllText(Path.Combine(fullPathToFile, fileName), json);
         }
 
         private TParserInterface CreateObjectInstance(Type type)
