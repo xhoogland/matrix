@@ -45,20 +45,11 @@ namespace Matrix.Parsers.Locations
 
         public async Task<IEnumerable<Location>> RetrieveLocationsFromContent()
         {
-            var fileLocationSplit = _fileLocation.Split(Path.DirectorySeparatorChar);
-            var downloadLocationSplit = _downloadLocation.ToString().Split('/');
             var importFolder = Directory.GetParent(_fileLocation).FullName;
-            await Task.Run(() =>
-            {
-                ZipFile.ExtractToDirectory(_fileLocation, importFolder, true);
-                var renamedNameOfFolder = Path.Combine(importFolder, fileLocationSplit.Last().Split('.').First());
-                if (Directory.Exists(renamedNameOfFolder))
-                    Directory.Delete(renamedNameOfFolder, true);
-
-                Directory.Move(Path.Combine(importFolder, downloadLocationSplit.Last().Split('.').First()), renamedNameOfFolder);
-            });
-            var extractFolderName = Path.GetFileNameWithoutExtension(_fileLocation);
-            var shapeFileDirectory = Path.Combine(importFolder, extractFolderName, "MSI");
+            var extractionFolder = Path.GetFileNameWithoutExtension(_fileLocation);
+            var fullExtractionFolder = Path.Combine(importFolder, extractionFolder);
+            await Task.Run(() => ZipFile.ExtractToDirectory(_fileLocation, fullExtractionFolder, true));
+            var shapeFileDirectory = Directory.EnumerateDirectories(fullExtractionFolder, "MSI", SearchOption.AllDirectories).First();
             var shapeFileLocation = Directory.EnumerateFiles(shapeFileDirectory, "*.shp").First();
             var shape = new ShapeFileReader(shapeFileLocation);
 
