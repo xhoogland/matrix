@@ -88,7 +88,7 @@ namespace Matrix.NotificationsApi.Controllers
                 return Conflict();
             }
 
-            if(!subscription.RoadWays.Any())
+            if (!subscription.RoadWays.Any())
             {
                 userSubscriptions = userSubscriptions.Where(u => JsonConvert.SerializeObject(u.PushSubscription) != JsonConvert.SerializeObject(notificationSubscription.PushSubscription)).ToList();
                 await WritePushUserSubscriptionsToFile(userSubscriptions);
@@ -157,15 +157,6 @@ namespace Matrix.NotificationsApi.Controllers
             var serializedObject = JsonConvert.SerializeObject(userSubscriptions, jsonSerializerSettings);
 
             await IoFile.WriteAllTextAsync(_subscriptionsPath, serializedObject);
-        }
-
-        /// <summary>
-        /// 409
-        /// </summary>
-        /// <returns></returns>
-        private StatusCodeResult Conflict()
-        {
-            return StatusCode(409);
         }
 
         /// <summary>
