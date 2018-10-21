@@ -55,11 +55,11 @@ namespace Matrix.NotificationsApi
             if (config.StartPath.StartsWith("__") && config.StartPath.EndsWith("__"))
                 config.StartPath = Directory.GetCurrentDirectory();
             if (config.DataPath.StartsWith("__") && config.DataPath.EndsWith("__"))
-                config.DataPath = Path.Combine(config.StartPath, "..", "LiveDataGenerator", "bin", "Debug", "netcoreapp2.0");
+                config.DataPath = Path.Combine(config.StartPath, "..", "LiveDataGenerator", "bin", "Debug", "netcoreapp2.1");
             if (config.SubscriptionsPath.StartsWith("__") && config.SubscriptionsPath.EndsWith("__"))
                 config.SubscriptionsPath = Path.Combine(config.StartPath, "..", "NotificationsApi");
             if (config.LocationsPath.StartsWith("__") && config.LocationsPath.EndsWith("__"))
-                config.LocationsPath = Path.Combine(config.StartPath, "..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.0");
+                config.LocationsPath = Path.Combine(config.StartPath, "..", "LocationsGenerator", "bin", "Debug", "netcoreapp2.1");
             if (config.Url.StartsWith("__") && config.Url.EndsWith("__"))
                 config.Url = "https://matrix-vnext.xanland.nl";
 
