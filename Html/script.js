@@ -68,8 +68,7 @@ function fillNotificationList() {
 }
 
 function handleNotificationList(result) {
-	const notificationList = document.getElementById('notificationList');
-	result.NotificationList.forEach(addOptionToNotficationList);
+    result.NotificationList.forEach(addOptionToNotficationList);
 }
 
 function addOptionToNotficationList (notification) {
@@ -214,7 +213,7 @@ function placePointOnMap(point) {
 	else {
 		if (point.isVisible) {
 			point.infoWindow.close();
-			point.marker.setMap(null)
+            point.marker.setMap(null);
 			point.isVisible = false;
 		}
 	}

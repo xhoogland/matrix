@@ -8,6 +8,6 @@ namespace Matrix.FileModels.LiveData.NLDLCS
 
         public Meta Meta { get; set; }
 
-        public IEnumerable<Event> @Event { get; set; }
+        public IEnumerable<Event> Event { get; set; }
     }
 }

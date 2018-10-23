@@ -72,10 +72,10 @@ namespace Matrix.Services
 
         private string Reformat(string id, string sign)
         {
-            var result = string.Empty;
+            string result;
             var resultSb = new StringBuilder();
 
-            if (int.TryParse(sign, out int signLength))
+            if (int.TryParse(sign, out _))
             {
                 result = string.Format("live/images/VMS/{0}", id);
             }

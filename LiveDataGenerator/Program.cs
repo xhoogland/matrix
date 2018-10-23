@@ -66,7 +66,7 @@ namespace Matrix.LiveDataGenerator
 
             foreach (var liveObject in allLiveData)
             {
-                var sign = string.Empty;
+                string sign;
                 if (!liveObject.IsValid)
                     continue;
                 else

@@ -34,7 +34,7 @@ namespace Matrix.NotificationsApi.Controllers
                 TypeNameHandling = TypeNameHandling.Auto
             };
             var locationsFile = await IoFile.ReadAllTextAsync(_locationsPath);
-            var locations = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSignPortal>>(locationsFile, settings);
+            var locations = JsonConvert.DeserializeObject<IEnumerable<VariableMessageSignPortal>>(locationsFile, settings).ToList();
             var roadWay = locations.SelectMany(l => l.RoadWays).FirstOrDefault(r => r.HmLocation == notificationSubscription.HmLocation);
             var chosenRoadWay = new PushRoadWay
             {
@@ -54,7 +54,7 @@ namespace Matrix.NotificationsApi.Controllers
                 userSubscriptions.Add(subscription);
             }
 
-            if (!subscription.RoadWays.Any(r => r.HmLocation == chosenRoadWay.HmLocation))
+            if (subscription.RoadWays.All(r => r.HmLocation != chosenRoadWay.HmLocation))
             {
                 subscription.RoadWays.Add(chosenRoadWay);
             }
