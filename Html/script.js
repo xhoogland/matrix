@@ -24,6 +24,28 @@ function loadJson(url, callback) {
     request.send();
 }
 
+function load2Json(url) {
+    return new Promise(function (resolve, reject) {
+        var xmlHttpRequest = new XMLHttpRequest();
+        xmlHttpRequest.open('GET', url);
+
+        xmlHttpRequest.onload = function () {
+            if (xmlHttpRequest.status == 200) {
+                resolve(xmlHttpRequest.response);
+            }
+            else {
+                reject(Error(xmlHttpRequest.statusText));
+            }
+        };
+
+        xmlHttpRequest.onerror = function () {
+            reject(Error('Network Error'));
+        };
+
+        xmlHttpRequest.send();
+    });
+}
+
 function sendRequest(type, url, data, callback) {
     var request = new XMLHttpRequest();
     request.open(type, url, true);
@@ -43,15 +65,15 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
         content = content + ' (<a href="#" onclick="deleteRoadWayHmLocationForSubscription(\'' + roadWay.HmLocation + '\')">X</a>)<br />';
 
         roadWay.VariableMessageSigns.forEach(function (vmsLane) {
-			let shownSign = 'images/' + country + '/blank.png';
-			let laneNumber = 'Rijstrook ' + vmsLane.Number;
-			if (!isLaneSpecific) {
-				shownSign = '';
-				laneNumber = 'DRIP';
-			}
+            let shownSign = 'images/' + country + '/blank.png';
+            let laneNumber = 'Rijstrook ' + vmsLane.Number;
+            if (!isLaneSpecific) {
+                shownSign = '';
+                laneNumber = 'DRIP';
+            }
 
-			content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" data-islanespecific="' + (isLaneSpecific ? 'true' : 'false') + '" data-country="' + country + '"/>&nbsp;';
-		});
+            content = content + '<img src="' + shownSign + '" title="' + laneNumber + '" id="' + vmsLane.Id + '" data-islanespecific="' + (isLaneSpecific ? 'true' : 'false') + '" data-country="' + country + '"/>&nbsp;';
+        });
         content = content + '<br />';
     });
 
@@ -59,32 +81,32 @@ function getInfoWindowContent(country, isLaneSpecific, roadWays) {
 }
 
 function fillNotificationList() {
-	swRegistration.pushManager.getSubscription().then(function (subscription) {
-		if (subscription !== null) {
-			document.getElementById('notificationList').hidden = false;
-			loadJson(config.Url + '/api/UserSubscription?pushSubscriptionEndpoint=' + encodeURI(subscription.endpoint), handleNotificationList);
-		}
-	});
+    swRegistration.pushManager.getSubscription().then(function (subscription) {
+        if (subscription !== null) {
+            document.getElementById('notificationList').hidden = false;
+            loadJson(config.Url + '/api/UserSubscription?pushSubscriptionEndpoint=' + encodeURI(subscription.endpoint), handleNotificationList);
+        }
+    });
 }
 
 function handleNotificationList(result) {
     result.NotificationList.forEach(addOptionToNotficationList);
 }
 
-function addOptionToNotficationList (notification) {
-	const option = document.createElement('option');
-	option.value = notification;
-	option.innerHTML = notification;
-	
-	notificationList.add(option);
+function addOptionToNotficationList(notification) {
+    const option = document.createElement('option');
+    option.value = notification;
+    option.innerHTML = notification;
+
+    notificationList.add(option);
 }
 
-function deleteOptionFromNotficationList (notification) {
-	const notificationList = document.getElementById('notificationList');
-	const optionsAmount = notificationList.options.length;
-	for(let i = 0; i < optionsAmount; i++) {
-      if (notificationList.options[i].value == notification)
-        notificationList.remove(i);
+function deleteOptionFromNotficationList(notification) {
+    const notificationList = document.getElementById('notificationList');
+    const optionsAmount = notificationList.options.length;
+    for (let i = 0; i < optionsAmount; i++) {
+        if (notificationList.options[i].value == notification)
+            notificationList.remove(i);
     }
 }
 
@@ -97,6 +119,7 @@ const ShownType = {
     Matrix: 1,
     Drip: 2,
 };
+
 function initMap() {
     const mapValues = {
         lat: parseFloat(getParamByName('lat') || 52.3393958),
@@ -188,35 +211,51 @@ function initMap() {
     trafficLayer.setMap(map);
 
     google.maps.event.addListener(map, 'idle', function () {
-        points.forEach(placePointOnMap);
+        placePointsOnMap().then(function (visiblePoints) {
+            visiblePoints.forEach(function (visiblePoint) {
+                visiblePoint.updateLiveMatrixImage(visiblePoint.infoWindow.getContent());
+            });
+        });
 
         updatePermaLinkAnchorHref();
     });
-	
-	setTimeout(fillNotificationList, 1000);
+
+    setTimeout(fillNotificationList, 1000);
 }
 
-function placePointOnMap(point) {
-	const typeShownSelect = document.getElementById('typeShown');
-	const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
-	if ((point.marker.position.lat() > map.getBounds().f.b && point.marker.position.lat() < map.getBounds().f.f)
-		&& (point.marker.position.lng() > map.getBounds().b.b && point.marker.position.lng() < map.getBounds().b.f)
-		&& map.zoom > 13
-		&& pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
-		if (!point.isVisible) {
-			point.marker.setMap(map);
-			point.infoWindow.open(map, point.marker);
-			point.updateLiveMatrixImage(point.infoWindow.getContent());
-			point.isVisible = true;
-		}
-	}
-	else {
-		if (point.isVisible) {
-			point.infoWindow.close();
-            point.marker.setMap(null);
-			point.isVisible = false;
-		}
-	}
+function placePointsOnMap() {
+    return new Promise(function (resolve, reject) {
+        const visiblePoints = new Map();
+        points.forEach(function (point, coordinate) {
+            const typeShownSelect = document.getElementById('typeShown');
+            const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
+            if ((point.marker.position.lat() > map.getBounds().getSouthWest().lat() && point.marker.position.lat() < map.getBounds().getNorthEast().lat())
+                && (point.marker.position.lng() > map.getBounds().getSouthWest().lng() && point.marker.position.lng() < map.getBounds().getNorthEast().lng())
+                && map.zoom > 13
+                && pointShouldBeVisible(tssValue, point.isLaneSpecific)) {
+                if (!point.isVisible) {
+                    point.marker.setMap(map);
+                    point.infoWindow.open(map, point.marker);
+                    point.isVisible = true;
+                    if (!visiblePoints.has(coordinate)) {
+                        visiblePoints.set(coordinate, point);
+                    }
+                }
+            }
+            else {
+                if (point.isVisible) {
+                    point.infoWindow.close();
+                    point.marker.setMap(null);
+                    point.isVisible = false;
+                    if (visiblePoints.has(coordinate)) {
+                        visiblePoints.delete(coordinate);
+                    }
+                }
+            }
+        });
+
+        resolve(visiblePoints);
+    });
 }
 
 function pointShouldBeVisible(dropdownValue, pointType) {
@@ -238,7 +277,9 @@ function loadMatrixen() {
 }
 
 function loadStaticMatrixen() {
-    loadJson('static/locations.json?1530906071', function (locations) {
+    load2Json('static/locations.json?1530906071').then(function (locationsJson) {
+        return JSON.parse(locationsJson);
+    }).then(function (locations) {
         locations.forEach(function (location) {
             const coordinate = location.Coordinates.X + '_' + location.Coordinates.Y;
             if (!points.has(coordinate)) {
@@ -260,30 +301,27 @@ function loadStaticMatrixen() {
                 point.updateLiveMatrixImage = updateLiveMatrixImage;
 
                 points.set(coordinate, point);
-				
-				location.RoadWays.forEach(function (roadWay) {
-					roadWayPoints.set(roadWay.HmLocation, coordinate);
-				});
+
+                location.RoadWays.forEach(function (roadWay) {
+                    roadWayPoints.set(roadWay.HmLocation, coordinate);
+                });
             }
         });
+    }).then(function () {
         loadLiveMatrixInfo(true);
     });
 }
 
 function loadLiveMatrixInfo(firstLoad) {
-    loadJson('live/liveData.json?' + Math.floor(Date.now() / 1000), function (liveData) {
+    load2Json('live/liveData.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
+        return JSON.parse(liveDataJson);
+    }).then(function (liveData) {
         liveData.forEach(function (liveVms) {
             liveVmsList[liveVms.Id] = liveVms.Sign;
         });
 
-        points.forEach(function (point) {
-            if (point.isVisible) {
-                point.updateLiveMatrixImage(point.infoWindow.getContent());
-            }
-        });
-
         if (firstLoad) {
-            google.maps.event.trigger(map, 'idle');
+            triggerGoogleMapsIdleEvent();
         }
     });
 }
@@ -306,31 +344,32 @@ function updateLiveMatrixImage(infoWindowContent) {
             element.setAttribute('src', 'images/' + element.getAttribute('data-country') + '/' + shownSign + '.png');
         }
         else {
-			updateNonLaneSpecificVms(element, imgTag);
+            updateNonLaneSpecificVms(element, imgTag);
         }
     });
 }
-function updateNonLaneSpecificVms(element, imgTag) {
-	if (isInteger(liveVmsList[imgTag.id]))
-		element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
-	else {
-		let divElement = null;
-		if (element.tagName.toLowerCase() == 'img') {
-			divElement = document.createElement('div');
-			divElement.setAttribute('title', element.getAttribute('title'));
-			divElement.setAttribute('id', element.getAttribute('id'));
-			divElement.setAttribute('data-islanespecific', element.getAttribute('data-islanespecific'));
-			divElement.setAttribute('data-country', element.getAttribute('data-country'));
-			divElement.setAttribute('class', 'textVms');
-			element.parentNode.replaceChild(divElement, element);
-		}
-		else {
-			divElement = element;
-		}
 
-		if (liveVmsList[imgTag.id])
-			divElement.innerHTML = liveVmsList[imgTag.id];
-	}
+function updateNonLaneSpecificVms(element, imgTag) {
+    if (isInteger(liveVmsList[imgTag.id]))
+        element.setAttribute('src', !liveVmsList[imgTag.id] ? '' : 'live/images/VMS/' + imgTag.id);
+    else {
+        let divElement = null;
+        if (element.tagName.toLowerCase() == 'img') {
+            divElement = document.createElement('div');
+            divElement.setAttribute('title', element.getAttribute('title'));
+            divElement.setAttribute('id', element.getAttribute('id'));
+            divElement.setAttribute('data-islanespecific', element.getAttribute('data-islanespecific'));
+            divElement.setAttribute('data-country', element.getAttribute('data-country'));
+            divElement.setAttribute('class', 'textVms');
+            element.parentNode.replaceChild(divElement, element);
+        }
+        else {
+            divElement = element;
+        }
+
+        if (liveVmsList[imgTag.id])
+            divElement.innerHTML = liveVmsList[imgTag.id];
+    }
 }
 
 function updatePermaLinkAnchorHref() {
@@ -361,21 +400,21 @@ function onTypeShownChanged(event) {
 }
 
 function onNotificationListChanged(event) {
-	const notificationListSelect = document.getElementById('notificationList');
+    const notificationListSelect = document.getElementById('notificationList');
     const nlValue = notificationListSelect.options[notificationListSelect.selectedIndex].value.toString();
-	if (nlValue === 'Notificatielijst')
-		return;
-	
-	const coordinates = roadWayPoints.get(nlValue).split('_');
-	map.setCenter({
-		lat: parseFloat(coordinates[0]),
-		lng: parseFloat(coordinates[1])
-	});
-	map.setZoom(17);
+    if (nlValue === 'Notificatielijst')
+        return;
+
+    const coordinates = roadWayPoints.get(nlValue).split('_');
+    map.setCenter({
+        lat: parseFloat(coordinates[0]),
+        lng: parseFloat(coordinates[1])
+    });
+    map.setZoom(17);
 }
 
 function triggerGoogleMapsIdleEvent() {
-	google.maps.event.trigger(map, 'idle');
+    google.maps.event.trigger(map, 'idle');
 }
 
 function urlB64ToUint8Array(base64String) {
@@ -398,9 +437,9 @@ const applicationServerKey = urlB64ToUint8Array('BOPhcWmoRn0wpBvBPTzDrFzIyH4IZ62
 
 function addRoadWayHmLocationForSubscription(hmLocation) {
     swRegistration.pushManager.subscribe({
-		userVisibleOnly: true,
-		applicationServerKey: applicationServerKey
-	}).then(function (subscription) {
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey
+    }).then(function (subscription) {
         subscriptionAddRoadWayHmLocation(subscription, hmLocation);
     }).catch(function (error) {
         console.error('addRoadWayHmLocationForSubscription: ' + error);
@@ -409,9 +448,9 @@ function addRoadWayHmLocationForSubscription(hmLocation) {
 
 function deleteRoadWayHmLocationForSubscription(hmLocation) {
     swRegistration.pushManager.subscribe({
-		userVisibleOnly: true,
-		applicationServerKey: applicationServerKey
-	}).then(function (subscription) {
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey
+    }).then(function (subscription) {
         subscriptionDeleteRoadWayHmLocation(subscription, hmLocation);
     }).catch(function (error) {
         console.error('deleteRoadWayHmLocationForSubscription: ' + error);
@@ -425,11 +464,11 @@ function subscriptionAddRoadWayHmLocation(subscription, hmLocation) {
     };
 
     sendRequest('POST', config.Url + '/api/UserSubscription', data, function (statusCode) {
-		let addText = '';
+        let addText = '';
         if (statusCode == 201) {
             addText = 'Genoteerd, je zou binnen 2 minuten een eerste notificatie moeten ontvangen van ' + hmLocation + '. Bij wijziging krijg je weer een nieuwe notificatie!';
-			addOptionToNotficationList(hmLocation);
-			document.getElementById('notificationList').hidden = false;
+            addOptionToNotficationList(hmLocation);
+            document.getElementById('notificationList').hidden = false;
         }
         else if (statusCode == 409) {
             addText = 'Interessant, je hebt al notificaties ingeschakeld voor ' + hmLocation + '. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
@@ -449,19 +488,19 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
     };
 
     sendRequest('DELETE', config.Url + '/api/UserSubscription', data, function (statusCode) {
-		let deleteText = '';
+        let deleteText = '';
         if (statusCode == 200) {
             deleteText = 'Begrijpelijk, we hebben je notificaties uitgeschakeld voor ' + hmLocation + '.';
-			deleteOptionFromNotficationList(hmLocation);
+            deleteOptionFromNotficationList(hmLocation);
         }
         else if (statusCode == 204) {
-            subscription.unsubscribe().then (function (success) {
-				alert('Jammer, nu we je notificaties hebben uitgeschakeld voor ' + hmLocation + ' blijft er niks meer over. We hebben je uit ons bestand gehaald. Het is uiteraard nog steeds mogelijk om weer nieuwe notificaties in te schakelen!');
-				deleteOptionFromNotficationList(hmLocation);
-				document.getElementById('notificationList').hidden = true;
-			}).catch(function (e) {
-				console.error('subscriptionDeleteRoadWayHmLocation - statusCode == 204: ' + e);
-			});
+            subscription.unsubscribe().then(function (success) {
+                alert('Jammer, nu we je notificaties hebben uitgeschakeld voor ' + hmLocation + ' blijft er niks meer over. We hebben je uit ons bestand gehaald. Het is uiteraard nog steeds mogelijk om weer nieuwe notificaties in te schakelen!');
+                deleteOptionFromNotficationList(hmLocation);
+                document.getElementById('notificationList').hidden = true;
+            }).catch(function (e) {
+                console.error('subscriptionDeleteRoadWayHmLocation - statusCode == 204: ' + e);
+            });
         }
         else if (statusCode == 409) {
             deleteText = 'Interessant, mogelijk kreeg je al geen notificaties meer voor ' + hmLocation + ' en/of andere locaties. Klopt dit niet? Neem eventueel contact op met de ontwikkelaar!';
@@ -472,8 +511,8 @@ function subscriptionDeleteRoadWayHmLocation(subscription, hmLocation) {
         else {
             deleteText = 'Helaas, er is iets mis gegaan met notificaties uitschakelen voor ' + hmLocation + '. Neem eventueel contact op met de ontwikkelaar!';
         }
-		
-		if (deleteText !== '')
-			alert(deleteText);
+
+        if (deleteText !== '')
+            alert(deleteText);
     });
 }
