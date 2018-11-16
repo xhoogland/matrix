@@ -111,6 +111,7 @@ function deleteOptionFromNotficationList(notification) {
 }
 
 let map;
+let firstLoad = true;
 const points = new Map();
 const roadWayPoints = new Map();
 const liveVmsList = [];
@@ -205,16 +206,21 @@ function initMap() {
         map.fitBounds(bounds);
     });
 
-    loadMatrixen();
-
     const trafficLayer = new google.maps.TrafficLayer();
     trafficLayer.setMap(map);
 
     google.maps.event.addListener(map, 'idle', function () {
+        if (firstLoad) {
+            loadMatrixInfo();
+            firstLoad = false;
+        }
+
         placePointsOnMap().then(function (visiblePoints) {
-            visiblePoints.forEach(function (visiblePoint) {
-                visiblePoint.updateLiveMatrixImage(visiblePoint.infoWindow.getContent());
-            });
+            setTimeout(function () {
+                visiblePoints.forEach(function (visiblePoint) {
+                    updateLiveMatrixImage(visiblePoint.infoWindow.getContent());
+                });
+            }, 1000);
         });
 
         updatePermaLinkAnchorHref();
@@ -226,9 +232,9 @@ function initMap() {
 function placePointsOnMap() {
     return new Promise(function (resolve, reject) {
         const visiblePoints = new Map();
+        const typeShownSelect = document.getElementById('typeShown');
+        const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
         points.forEach(function (point, coordinate) {
-            const typeShownSelect = document.getElementById('typeShown');
-            const tssValue = typeShownSelect.options[typeShownSelect.selectedIndex].value;
             if ((point.marker.position.lat() > map.getBounds().getSouthWest().lat() && point.marker.position.lat() < map.getBounds().getNorthEast().lat())
                 && (point.marker.position.lng() > map.getBounds().getSouthWest().lng() && point.marker.position.lng() < map.getBounds().getNorthEast().lng())
                 && map.zoom > 13
@@ -271,8 +277,9 @@ function pointShouldBeVisible(dropdownValue, pointType) {
     return false;
 }
 
-function loadMatrixen() {
+function loadMatrixInfo() {
     loadStaticMatrixen();
+    loadLiveMatrixInfo();
     setInterval(loadLiveMatrixInfo, 1001 * 60);
 }
 
@@ -298,7 +305,6 @@ function loadStaticMatrixen() {
                 point.marker.addListener('click', function () {
                     point.infoWindow.open(map, point.marker);
                 });
-                point.updateLiveMatrixImage = updateLiveMatrixImage;
 
                 points.set(coordinate, point);
 
@@ -308,21 +314,19 @@ function loadStaticMatrixen() {
             }
         });
     }).then(function () {
-        loadLiveMatrixInfo(true);
+        triggerGoogleMapsIdleEvent();
     });
 }
 
-function loadLiveMatrixInfo(firstLoad) {
+function loadLiveMatrixInfo() {
     load2Json('live/liveData.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
         return JSON.parse(liveDataJson);
     }).then(function (liveData) {
         liveData.forEach(function (liveVms) {
             liveVmsList[liveVms.Id] = liveVms.Sign;
         });
-
-        if (firstLoad) {
-            triggerGoogleMapsIdleEvent();
-        }
+    }).then(function () {
+        triggerGoogleMapsIdleEvent();
     });
 }
 
