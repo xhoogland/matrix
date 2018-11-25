@@ -11,5 +11,9 @@
         public string NLDAllLCSLiveDataParser { get; set; }
 
         public string NLDAllVMSLiveDataParser { get; set; }
+
+        public string BELAllLCSLocationsParser { get; set; }
+
+        public string BELAllLCSLiveDataParser { get; set; }
     }
 }

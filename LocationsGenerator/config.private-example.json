@@ -2,6 +2,7 @@
   "DownloadUrl": {
     "NLDAllVMSLocationsParser": "",
     "NLDGeneralLCSLocationsParser": "",
-    "NLDSAAReversibleLaneLCSLocationsParser": ""
+    "NLDSAAReversibleLaneLCSLocationsParser": "",
+    "BELAllLCSLocationsParser": ""
   }
 }

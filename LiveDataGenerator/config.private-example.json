@@ -1,6 +1,7 @@
 ﻿{
   "DownloadUrl": {
     "NLDAllLCSLiveDataParser": "",
-    "NLDAllVMSLiveDataParser": ""
+    "NLDAllVMSLiveDataParser": "",
+    "BELAllLCSLiveDataParser": ""
   }
 }

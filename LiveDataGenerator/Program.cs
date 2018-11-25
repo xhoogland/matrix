@@ -66,32 +66,30 @@ namespace Matrix.LiveDataGenerator
 
             foreach (var liveObject in allLiveData)
             {
-                string sign;
                 if (!liveObject.IsValid)
                     continue;
+
+                string sign;
+                var prefix = "TP|";
+                if (liveObject.Sign.StartsWith(prefix))
+                {
+                    sign = liveObject.Sign.Remove(0, prefix.Length);
+                }
                 else
                 {
-                    var prefix = "TP|";
-                    if (liveObject.Sign.StartsWith(prefix))
+                    if (liveObject.Sign.Length > 35)
                     {
-                        sign = liveObject.Sign.Remove(0, prefix.Length);
+                        var fullFilePath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
+                        var oldObject = currentJson.FirstOrDefault(v => v.Id == liveObject.Id);
+                        var base64SignLength = liveObject.Sign.Length.ToString();
+                        if (oldObject == null || oldObject.Sign != base64SignLength)
+                            await File.WriteAllBytesAsync(fullFilePath, Convert.FromBase64String(liveObject.Sign));
+
+                        sign = base64SignLength;
                     }
                     else
                     {
-                        if (liveObject.Sign.Length > 35)
-                        {
-                            var fullFilePath = Path.Combine(vmsPath, StripTextOfInvalidCharsForSaveToFileSystem(liveObject.Id));
-                            var oldObject = currentJson.FirstOrDefault(v => v.Id == liveObject.Id);
-                            var base64SignLength = liveObject.Sign.Length.ToString();
-                            if (oldObject == null || oldObject.Sign != base64SignLength)
-                                await File.WriteAllBytesAsync(fullFilePath, Convert.FromBase64String(liveObject.Sign));
-
-                            sign = base64SignLength;
-                        }
-                        else
-                        {
-                            sign = liveObject.Sign;
-                        }
+                        sign = liveObject.Sign;
                     }
                 }
 
