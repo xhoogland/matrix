@@ -243,9 +243,10 @@ function placePointsOnMap() {
                     point.marker.setMap(map);
                     point.infoWindow.open(map, point.marker);
                     point.isVisible = true;
-                    if (!visiblePoints.has(coordinate)) {
-                        visiblePoints.set(coordinate, point);
-                    }
+                }
+
+                if (!visiblePoints.has(coordinate)) {
+                    visiblePoints.set(coordinate, point);
                 }
             }
             else {
