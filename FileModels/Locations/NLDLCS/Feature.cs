@@ -12,7 +12,7 @@ namespace Matrix.FileModels.Locations.NLDLCS
 
         public Geometry Geometry { get; set; }
 
-        public bool HasCoordinates => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2 &&
+        public bool IsValid => Geometry.Coordinates != null && Geometry.Coordinates.Count() == 2 &&
                                    Geometry.Coordinates.Last() != 0 && Geometry.Coordinates.First() != 0;
 
         public float? Km => Properties.Km;
@@ -33,5 +33,7 @@ namespace Matrix.FileModels.Locations.NLDLCS
         public string Id => Properties.Uuid;
 
         public bool IsLaneSpecific => true;
+
+        public string Country => "NL";
     }
 }

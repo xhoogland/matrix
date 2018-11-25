@@ -13,7 +13,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
 
         public ushort Version { get; set; }
 
-        public bool HasCoordinates => VmsRecord.VmsRecord.VmsLocation != null &&
+        public bool IsValid => VmsRecord.VmsRecord.VmsLocation != null &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay != null &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Latitude != 0 &&
                                    VmsRecord.VmsRecord.VmsLocation.LocationForDisplay.Longitude != 0;
@@ -35,5 +35,7 @@ namespace Matrix.FileModels.Locations.NLDVMS
         public int? Lane => null;
 
         public bool IsLaneSpecific => false;
+
+        public string Country => "NL";
     }
 }

@@ -35,7 +35,7 @@ namespace Matrix.LocationsGenerator
             var portals = new List<VariableMessageSignPortal>();
             foreach (var location in locations.OrderBy(l => l.Lane))
             {
-                if (!location.HasCoordinates)
+                if (!location.IsValid)
                     continue;
 
                 var isLaneSpecific = location.IsLaneSpecific;
@@ -49,14 +49,15 @@ namespace Matrix.LocationsGenerator
                 var roadSide = location.RoadSide;
                 var id = location.Id;
                 var hmLocation = string.Format("{0} {1} {2}", roadName, roadSide, km).Trim();
+                var country = location.Country;
 
-                AddVmsToPortal(portals, isLaneSpecific, lane, coordinates, id, hmLocation);
+                AddVmsToPortal(portals, isLaneSpecific, lane, coordinates, id, hmLocation, country);
             }
 
             return portals;
         }
 
-        private static void AddVmsToPortal(IList<VariableMessageSignPortal> portals, bool isLaneSpecific, int? lane, Coordinates coordinates, string id, string hmLocation)
+        private static void AddVmsToPortal(IList<VariableMessageSignPortal> portals, bool isLaneSpecific, int? lane, Coordinates coordinates, string id, string hmLocation, string country)
         {
             VariableMessageSign vms;
             if (isLaneSpecific)
@@ -82,7 +83,7 @@ namespace Matrix.LocationsGenerator
                 portal = new VariableMessageSignPortal
                 {
                     Coordinates = coordinates,
-                    Country = "NL",
+                    Country = country,
                     IsLaneSpecific = isLaneSpecific
                 };
                 portals.Add(portal);
