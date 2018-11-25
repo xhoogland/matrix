@@ -14,8 +14,10 @@
 
         int? Lane { get; }
 
-        bool HasCoordinates { get; }
+        bool IsValid { get; }
 
         bool IsLaneSpecific { get; }
+
+        string Country { get; }
     }
 }
