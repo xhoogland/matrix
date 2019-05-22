@@ -41,9 +41,11 @@ namespace Matrix.Services
                 {
                     foreach (var vms in roadWay.VariableMessageSigns)
                     {
-                        var id = vms.Id;
+                        var liveSign = _liveData.SingleOrDefault(l => l.Id == vms.Id);
+                        if (liveSign == null)
+                            continue;
 
-                        vms.Sign = _liveData.SingleOrDefault(l => l.Id == id).Sign;
+                        vms.Sign = liveSign.Sign;
                     }
                 }
             }
@@ -57,9 +59,11 @@ namespace Matrix.Services
                 {
                     foreach (var vms in roadWay.VariableMessageSigns)
                     {
-                        var id = vms.Id;
+                        var liveSign = _liveData.SingleOrDefault(l => l.Id == vms.Id);
+                        if (liveSign == null)
+                            continue;
 
-                        vms.Sign = _liveData.SingleOrDefault(l => l.Id == id).Sign;
+                        vms.Sign = liveSign.Sign;
                     }
                 }
             }
