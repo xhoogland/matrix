@@ -19,6 +19,7 @@ namespace Matrix.Services
         public JsonSerializerSettings JsonConfig { get; }
 
         public string SavePath { get; }
+
         public string ApiUrl { get; }
 
         public GeneratorService(TypeNameHandling typeNameHandling = TypeNameHandling.None)
@@ -56,13 +57,12 @@ namespace Matrix.Services
             return config;
         }
 
-        public void WriteJsonFile(string json, string fileName)
+        public void WriteJsonFile(string json, string path, string fileName)
         {
-            var fullPathToFile = Path.Combine(_config.StartPath, _config.DataPath);
-            if (!Directory.Exists(fullPathToFile))
-                Directory.CreateDirectory(fullPathToFile);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
 
-            File.WriteAllText(Path.Combine(fullPathToFile, fileName), json);
+            File.WriteAllText(Path.Combine(path, fileName), json);
         }
 
         private TParserInterface CreateObjectInstance(Type type)

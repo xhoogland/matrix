@@ -19,7 +19,7 @@ namespace Matrix.LocationsGenerator
             var portalLocations = FillPortalsAsync(locationParsers).Result;
 
             var json = JsonConvert.SerializeObject(portalLocations, serviceHandler.JsonConfig);
-            serviceHandler.WriteJsonFile(json, "locations.json");
+            serviceHandler.WriteJsonFile(json, serviceHandler.SavePath, "locations.json");
         }
 
         private static async Task<List<VariableMessageSignPortal>> FillPortalsAsync(IList<LocationParser> locationParsers)

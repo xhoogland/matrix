@@ -319,8 +319,9 @@ function loadStaticMatrixen() {
     });
 }
 
+let jsonFile = 'liveData';
 function loadLiveMatrixInfo() {
-    load2Json('live/liveData.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
+    load2Json('live/' + jsonFile + '.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
         return JSON.parse(liveDataJson);
     }).then(function (liveData) {
         liveData.forEach(function (liveVms) {
