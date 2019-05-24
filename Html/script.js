@@ -1,5 +1,6 @@
 const config = { Url: '__ApiUrl__' };
 document.getElementById('notificationList').hidden = true;
+document.getElementById('historyDtPicker').hidden = true;
 if ('serviceWorker' in navigator && 'PushManager' in window) {
     navigator.serviceWorker.register('serviceWorker.js').then(function (swReg) {
         swRegistration = swReg;
@@ -120,6 +121,7 @@ const ShownType = {
     Matrix: 1,
     Drip: 2,
 };
+let inHistoryModus = false;
 
 function initMap() {
     const mapValues = {
@@ -145,6 +147,12 @@ function initMap() {
 
     const notificationList = document.getElementById('notificationList');
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(notificationList);
+
+    const historyDtPicker = document.getElementById('historyDtPicker');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(historyDtPicker);
+
+    const historyButton = document.getElementById('historyButton');
+    map.controls[google.maps.ControlPosition.RIGHT_TOP].push(historyButton);
 
     //const signsCopyGertDiv = document.getElementById('signsCopyGert');
     //map.controls[google.maps.ControlPosition.TOP_LEFT].push(signsCopyGertDiv);
@@ -227,6 +235,13 @@ function initMap() {
     });
 
     setTimeout(fillNotificationList, 1000);
+}
+
+function initHistory() {
+    document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
+    document.getElementById('typeShown').disabled = true;
+    document.getElementById('notificationList').hidden = true;
+    document.getElementById('historyDtPicker').hidden = false;
 }
 
 function placePointsOnMap() {
@@ -319,8 +334,10 @@ function loadStaticMatrixen() {
     });
 }
 
-let jsonFile = 'liveData';
-function loadLiveMatrixInfo() {
+function loadLiveMatrixInfo(jsonFile = 'liveData') {
+    if (!jsonFile && inHistoryModus)
+        return;
+
     load2Json('live/' + jsonFile + '.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
         return JSON.parse(liveDataJson);
     }).then(function (liveData) {
@@ -399,6 +416,7 @@ function getParamByName(name) {
 window.addEventListener('load', function () {
     document.querySelector('select[name="typeShown"]').onchange = onTypeShownChanged;
     document.querySelector('select[name="notificationList"]').onchange = onNotificationListChanged;
+    document.getElementById('historyDtPicker').onchange = onHistoryDtPickerChanged;
 }, false);
 
 function onTypeShownChanged(event) {
@@ -417,6 +435,18 @@ function onNotificationListChanged(event) {
         lng: parseFloat(coordinates[1])
     });
     map.setZoom(17);
+}
+
+function onHistoryDtPickerChanged(event) {
+    const localDt = new Date(event.target.value);
+    const fileName = localDt.getUTCFullYear().toString()
+        + ((localDt.getUTCMonth() + 1) < 10 ? 0 : '') + (localDt.getUTCMonth() + 1)
+        + (localDt.getUTCDate() < 10 ? 0 : '') + localDt.getUTCDate()
+        + '-'
+        + (localDt.getUTCHours() < 10 ? 0 : '') + localDt.getUTCHours()
+        + (localDt.getUTCMinutes() < 10 ? 0 : '') + localDt.getUTCMinutes();
+    inHistoryModus = true;
+    loadLiveMatrixInfo('history/' + fileName);
 }
 
 function triggerGoogleMapsIdleEvent() {

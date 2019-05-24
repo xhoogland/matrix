@@ -24,7 +24,8 @@ namespace Matrix.LiveDataGenerator
 
             var liveDataJson = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(liveDataJson, serviceHandler.SavePath, "liveData.json");
-            serviceHandler.WriteJsonFile(liveDataJson, Path.Combine(serviceHandler.SavePath, "history"), string.Format("{0}.json", DateTime.UtcNow.ToString("yyyyMMdd-HHmm")));
+            var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyyMMdd-HHmm"));
+            serviceHandler.WriteJsonFile(liveDataJson, Path.Combine(serviceHandler.SavePath, "history"), fileName);
 
             TriggerNotificationSending(serviceHandler.ApiUrl);
         }

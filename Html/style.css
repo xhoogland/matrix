@@ -73,10 +73,10 @@ html, body {
     margin-left: 12px;
     padding: 0 11px 0 13px;
     text-overflow: ellipsis;
-    width: 200px;
+    width: 168px;
     top: 9.4px !important;
     height: 37.2px;
-    left: 168px !important;
+    left: 192px !important;
 }
 
 #searchBox:focus {
@@ -93,7 +93,14 @@ html, body {
     left: 119px !important;
     top: 50px !important;
     height: 40px;
-    width: 289px;
+    width: 281px;
+}
+
+#historyDtPicker {
+    left: 119px !important;
+    top: 50px !important;
+    height: 36px;
+    width: 276px;
 }
 
 #signsCopyGert {
@@ -122,6 +129,20 @@ html, body {
     color: black !important;
     text-decoration: none !important;
 }
+
+#historyButton {
+    background-color: white;
+    width: 34px;
+    right: 10px !important;
+    margin-top: -9px;
+    font-size: 28px;
+    padding: 3px;
+}
+
+    #historyButton > a {
+        color: black !important;
+        text-decoration: none !important;
+    }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
     #searchBox {
