@@ -20,12 +20,27 @@ namespace Matrix.LiveDataGenerator
 
             var liveDataParsers = serviceHandler.GetParserImplementations();
 
-            var liveData = FillLiveDataAsync(liveDataParsers, serviceHandler.SavePath).Result;
+            var liveData = FillLiveDataAsync(liveDataParsers, serviceHandler.SavePath).GetAwaiter().GetResult();
 
             var liveDataJson = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(liveDataJson, serviceHandler.SavePath, "liveData.json");
-            var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyyMMdd-HHmm"));
-            serviceHandler.WriteJsonFile(liveDataJson, Path.Combine(serviceHandler.SavePath, "history"), fileName);
+            var historyPath = Path.Combine(serviceHandler.SavePath, "history");
+            string historyJson;
+            var mostRecentHistoryFile = new DirectoryInfo(historyPath).GetFiles().OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
+            if (mostRecentHistoryFile == null)
+            {
+                historyJson = string.Empty;
+            }
+            else
+            {
+                historyJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<IEnumerable<VariableMessageSign>>(File.ReadAllTextAsync(mostRecentHistoryFile.FullName).GetAwaiter().GetResult()));
+            }
+            
+            if (historyJson != liveDataJson)
+            {
+                var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyyMMdd-HHmm"));
+                serviceHandler.WriteJsonFile(liveDataJson, historyPath, fileName);
+            }
 
             TriggerNotificationSending(serviceHandler.ApiUrl);
         }

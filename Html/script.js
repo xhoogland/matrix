@@ -35,7 +35,7 @@ function load2Json(url) {
                 resolve(xmlHttpRequest.response);
             }
             else {
-                reject(Error(xmlHttpRequest.statusText));
+                reject(Error(xmlHttpRequest.status));
             }
         };
 
@@ -44,6 +44,21 @@ function load2Json(url) {
         };
 
         xmlHttpRequest.send();
+    });
+}
+
+function loadMatrixJson(fileName) {
+    return new Promise(function (resolve, reject) {
+        load2Json('live/' + fileName + '.json?' + Math.floor(Date.now() / 1000)).then(function (result) {
+            resolve(result);
+        }).catch(function (error) {
+            if (error.message.toString() === "404") {
+                const fileNameParts = fileName.split('-');
+                const time = fileNameParts[1];
+                const newFileName = fileNameParts[0] + '-' + (time - 1);
+                loadMatrixJson(newFileName);
+            }
+        });
     });
 }
 
@@ -238,10 +253,12 @@ function initMap() {
 }
 
 function initHistory() {
+    inHistoryModus = true;
     document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
     document.getElementById('typeShown').disabled = true;
     document.getElementById('notificationList').hidden = true;
     document.getElementById('historyDtPicker').hidden = false;
+    triggerGoogleMapsIdleEvent();
 }
 
 function placePointsOnMap() {
@@ -334,11 +351,11 @@ function loadStaticMatrixen() {
     });
 }
 
-function loadLiveMatrixInfo(jsonFile = 'liveData') {
-    if (jsonFile === 'liveData' && inHistoryModus)
+function loadLiveMatrixInfo(fileName = 'liveData') {
+    if (fileName === 'liveData' && inHistoryModus)
         return;
 
-    load2Json('live/' + jsonFile + '.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
+    loadMatrixJson(fileName).then(function (liveDataJson) {
         return JSON.parse(liveDataJson);
     }).then(function (liveData) {
         liveData.forEach(function (liveVms) {
@@ -445,7 +462,6 @@ function onHistoryDtPickerChanged(event) {
         + '-'
         + (localDt.getUTCHours() < 10 ? 0 : '') + localDt.getUTCHours()
         + (localDt.getUTCMinutes() < 10 ? 0 : '') + localDt.getUTCMinutes();
-    inHistoryModus = true;
     loadLiveMatrixInfo('history/' + fileName);
 }
 
