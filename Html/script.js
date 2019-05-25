@@ -335,7 +335,7 @@ function loadStaticMatrixen() {
 }
 
 function loadLiveMatrixInfo(jsonFile = 'liveData') {
-    if (!jsonFile && inHistoryModus)
+    if (jsonFile === 'liveData' && inHistoryModus)
         return;
 
     load2Json('live/' + jsonFile + '.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
