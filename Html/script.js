@@ -1,4 +1,6 @@
 const config = { Url: '__ApiUrl__' };
+let inHistoryModus = false;
+
 document.getElementById('notificationList').hidden = true;
 document.getElementById('historyDtPicker').hidden = true;
 if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -48,14 +50,17 @@ function load2Json(url) {
 }
 
 function loadMatrixJson(fileName) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
+        const originalFilename = fileName;
+        if (fileName !== 'liveData' && inHistoryModus) {
+            fileName = 'history/' + fileName.substring(0, 16).replace(':', '_');
+        }
+
         load2Json('live/' + fileName + '.json?' + Math.floor(Date.now() / 1000)).then(function (result) {
             resolve(result);
         }).catch(function (error) {
-            if (error.message.toString() === "404") {
-                const fileNameParts = fileName.split('-');
-                const time = fileNameParts[1];
-                const newFileName = fileNameParts[0] + '-' + (time - 1);
+            if (inHistoryModus && error.message === "404") {
+                const newFileName = new Date(new Date(originalFilename).getTime() - 60000).toISOString();
                 loadMatrixJson(newFileName);
             }
         });
@@ -69,7 +74,7 @@ function sendRequest(type, url, data, callback) {
     request.onreadystatechange = function () {
         if (callback && this.readyState == XMLHttpRequest.DONE)
             callback(this.status);
-    }
+    };
     request.send(JSON.stringify(data));
 }
 
@@ -136,7 +141,6 @@ const ShownType = {
     Matrix: 1,
     Drip: 2,
 };
-let inHistoryModus = false;
 
 function initMap() {
     const mapValues = {
@@ -252,12 +256,24 @@ function initMap() {
     setTimeout(fillNotificationList, 1000);
 }
 
-function initHistory() {
-    inHistoryModus = true;
-    document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
-    document.getElementById('typeShown').disabled = true;
-    document.getElementById('notificationList').hidden = true;
-    document.getElementById('historyDtPicker').hidden = false;
+function toggleHistoryModus() {
+    if (!inHistoryModus) {
+        inHistoryModus = true;
+        document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
+        //document.getElementById('typeShown').disabled = true;
+        document.getElementById('notificationList').hidden = true;
+        //document.getElementById('historyDtPicker').hidden = false;
+    }
+    else {
+        inHistoryModus = false;
+        document.querySelector('#typeShown [value="' + ShownType.Both + '"]').selected = true;
+        //document.getElementById('typeShown').disabled = false;
+        fillNotificationList();
+        //document.getElementById('historyDtPicker').hidden = true;
+    }
+
+    document.getElementById('typeShown').disabled = inHistoryModus;
+    document.getElementById('historyDtPicker').hidden = !inHistoryModus;
     triggerGoogleMapsIdleEvent();
 }
 
@@ -456,13 +472,8 @@ function onNotificationListChanged(event) {
 
 function onHistoryDtPickerChanged(event) {
     const localDt = new Date(event.target.value);
-    const fileName = localDt.getUTCFullYear().toString()
-        + ((localDt.getUTCMonth() + 1) < 10 ? 0 : '') + (localDt.getUTCMonth() + 1)
-        + (localDt.getUTCDate() < 10 ? 0 : '') + localDt.getUTCDate()
-        + '-'
-        + (localDt.getUTCHours() < 10 ? 0 : '') + localDt.getUTCHours()
-        + (localDt.getUTCMinutes() < 10 ? 0 : '') + localDt.getUTCMinutes();
-    loadLiveMatrixInfo('history/' + fileName);
+    const fileName = new Date(localDt.getTime()).toISOString();
+    loadLiveMatrixInfo(fileName);
 }
 
 function triggerGoogleMapsIdleEvent() {
