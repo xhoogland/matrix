@@ -38,7 +38,7 @@ namespace Matrix.LiveDataGenerator
             
             if (historyJson != liveDataJson)
             {
-                var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyyMMdd-HHmm"));
+                var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyy-MM-ddTHH_mm"));
                 serviceHandler.WriteJsonFile(liveDataJson, historyPath, fileName);
             }
 
