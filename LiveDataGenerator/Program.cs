@@ -25,7 +25,7 @@ namespace Matrix.LiveDataGenerator
             var liveDataJson = JsonConvert.SerializeObject(liveData, serviceHandler.JsonConfig);
             serviceHandler.WriteJsonFile(liveDataJson, serviceHandler.SavePath, "liveData.json");
             var historyPath = Path.Combine(serviceHandler.SavePath, "history");
-            string historyJson;
+            string historyJson = null;
             var mostRecentHistoryFile = new DirectoryInfo(historyPath).GetFiles().OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
             if (mostRecentHistoryFile == null)
             {
@@ -33,9 +33,17 @@ namespace Matrix.LiveDataGenerator
             }
             else
             {
-                historyJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<IEnumerable<VariableMessageSign>>(File.ReadAllTextAsync(mostRecentHistoryFile.FullName).GetAwaiter().GetResult()));
+                try
+                {
+                    var historyFileContent = File.ReadAllTextAsync(mostRecentHistoryFile.FullName).GetAwaiter().GetResult();
+                    historyJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject<IEnumerable<VariableMessageSign>>(historyFileContent));
+                }
+                catch (Exception ex)
+                {
+                    // Ignore, since a new history-file can be created although we have issues.
+                }
             }
-            
+
             if (historyJson != liveDataJson)
             {
                 var fileName = string.Format("{0}.json", DateTime.UtcNow.ToString("yyyy-MM-ddTHH_mm"));

@@ -333,7 +333,7 @@ function loadMatrixInfo() {
 }
 
 function loadStaticMatrixen() {
-    load2Json('static/locations.json?1530906071').then(function (locationsJson) {
+    load2Json('static/locations.json?1567897244').then(function (locationsJson) {
         return JSON.parse(locationsJson);
     }).then(function (locations) {
         locations.forEach(function (location) {
