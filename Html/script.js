@@ -62,7 +62,7 @@ function loadMatrixJson(fileName) {
         }).catch(function (error) {
             if (inHistoryModus && error.message === "404") {
                 const newFileName = new Date(new Date(originalFilename).getTime() - 60000).toISOString();
-                loadMatrixJson(newFileName);
+                resolve(loadMatrixJson(newFileName));
             }
         });
     });
@@ -264,9 +264,9 @@ function toggleHistoryModus() {
         document.getElementById('notificationList').hidden = true;
     }
     else {
+        fillNotificationList();
         inHistoryModus = false;
         document.querySelector('#typeShown [value="' + ShownType.Both + '"]').selected = true;
-        fillNotificationList();
     }
 
     document.getElementById('typeShown').disabled = inHistoryModus;
