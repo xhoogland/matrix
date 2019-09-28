@@ -1,5 +1,6 @@
 const config = { Url: '__ApiUrl__' };
 let inHistoryModus = false;
+let historyIsSearchingAndLoadingTimeout = null;
 
 document.getElementById('notificationList').hidden = true;
 document.getElementById('historyDtPicker').hidden = true;
@@ -260,16 +261,12 @@ function toggleHistoryModus() {
     if (!inHistoryModus) {
         inHistoryModus = true;
         document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
-        //document.getElementById('typeShown').disabled = true;
         document.getElementById('notificationList').hidden = true;
-        //document.getElementById('historyDtPicker').hidden = false;
     }
     else {
         inHistoryModus = false;
         document.querySelector('#typeShown [value="' + ShownType.Both + '"]').selected = true;
-        //document.getElementById('typeShown').disabled = false;
         fillNotificationList();
-        //document.getElementById('historyDtPicker').hidden = true;
     }
 
     document.getElementById('typeShown').disabled = inHistoryModus;
@@ -471,9 +468,13 @@ function onNotificationListChanged(event) {
 }
 
 function onHistoryDtPickerChanged(event) {
-    const localDt = new Date(event.target.value);
-    const fileName = new Date(localDt.getTime()).toISOString();
-    loadLiveMatrixInfo(fileName);
+    clearTimeout(historyIsSearchingAndLoadingTimeout);
+
+    historyIsSearchingAndLoadingTimeout = setTimeout(function () {
+        const localDt = new Date(event.target.value);
+        const fileName = new Date(localDt.getTime()).toISOString();
+        loadLiveMatrixInfo(fileName);
+    }, 750);
 }
 
 function triggerGoogleMapsIdleEvent() {
