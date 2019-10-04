@@ -474,7 +474,7 @@ function onHistoryDtPickerChanged(event) {
         const localDt = new Date(event.target.value);
         const fileName = new Date(localDt.getTime()).toISOString();
         loadLiveMatrixInfo(fileName);
-    }, 750);
+    }, 500);
 }
 
 function triggerGoogleMapsIdleEvent() {

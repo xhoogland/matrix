@@ -8,17 +8,17 @@
 </head>
 <body>
     <input id="searchBox" type="text" placeholder="Search" />
-    <select name="typeShown" id="typeShown">
+    <select name="typeShown" id="typeShown" title="Type: Welk type borden, of allebei, moet worden weergegeven.">
         <option value="0">Matrix & DRIP</option>
         <option value="1">Matrix</option>
         <option value="2">DRIP</option>
     </select>
-    <select name="notificationList" id="notificationList" class="leftTopEdges">
+    <select name="notificationList" id="notificationList" class="leftTopEdges" title="Notificaties: Na klikken op een locatie voor updates, is dit de volledige lijst van al die locaties.">
         <option selected>Notificatielijst</option>
     </select>
-    <input id="historyDtPicker" class="leftTopEdges" type="datetime-local" />
-    <div id="historyButton"><a href="#" id="historyAnchorHref" onclick="toggleHistoryModus()"><i class="fas fa-history"></i></a></div>
-    <div id="permaLink"><a id="permaLinkAnchorHref"><i class="fas fa-link"></i></a></div>
+    <input id="historyDtPicker" class="leftTopEdges" type="datetime-local" title="History-picker: Selecteer een datumtijd om de stand van de matrixborden op dat moment te zien." />
+    <div id="historyButton"><a href="#" id="historyAnchorHref" onclick="toggleHistoryModus()" title="History/Live-switch: Klik om van een opgegeven datumtijd de stand van de matrixborden van toen te zien of bekijk na een extra klik de huidige status."><i class="fas fa-history"></i></a></div>
+    <div id="permaLink"><a id="permaLinkAnchorHref" title="Permalink: Maakt een link om deze locatie makkelijk te kunnen openen en delen."><i class="fas fa-link"></i></a></div>
     <div id="map"></div>
     <script src="script.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyA3sSJDNgn0zezcAxPqWcrW5wyT67QUkyg&callback=initMap&region=NL&libraries=places"></script>
