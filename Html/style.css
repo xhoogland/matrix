@@ -73,15 +73,15 @@ html, body {
     margin-left: 12px;
     padding: 0 11px 0 13px;
     text-overflow: ellipsis;
-    width: 200px;
+    width: 142px;
     top: 9.4px !important;
     height: 37.2px;
     left: 168px !important;
 }
 
-#searchBox:focus {
-    border-color: #4d90fe;
-}
+    #searchBox:focus {
+        border-color: #4d90fe;
+    }
 
 #typeShown {
     left: 10px !important;
@@ -90,10 +90,18 @@ html, body {
 }
 
 #notificationList {
+    height: 40px;
+    width: 231px;
+}
+
+#historyDtPicker {
+    height: 36px;
+    width: 226px;
+}
+
+.leftTopEdges {
     left: 119px !important;
     top: 50px !important;
-    height: 40px;
-    width: 289px;
 }
 
 #signsCopyGert {
@@ -118,22 +126,26 @@ html, body {
     padding: 3px;
 }
 
-#permaLink > a {
-    color: black !important;
-    text-decoration: none !important;
-}
-
-@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-    #searchBox {
-        left: 192px !important;
-        width: 120px;
+    #permaLink > a {
+        color: black !important;
+        text-decoration: none !important;
+        padding-left: 3px;
     }
 
-    #notificationList {
-        left: 114px !important;
-        width: 238px;
-    }
+#historyButton {
+    background-color: white;
+    width: 34px;
+    right: 10px !important;
+    margin-top: -9px;
+    font-size: 28px;
+    padding: 3px;
 }
+
+    #historyButton > a {
+        color: black !important;
+        text-decoration: none !important;
+        padding-left: 3px;
+    }
 
 .textVms {
     background-color: #000000;
@@ -142,4 +154,21 @@ html, body {
     color: #ffffff;
     font-size: 22px;
     text-align: center;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+    #searchBox {
+        left: 192px !important;
+        width: 129px;
+    }
+
+    #notificationList {
+        left: 114px !important;
+        width: 247px;
+    }
+
+    #historyDtPicker {
+        left: 114px !important;
+        width: 245px;
+    }
 }

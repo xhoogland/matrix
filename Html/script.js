@@ -1,5 +1,9 @@
 const config = { Url: '__ApiUrl__' };
+let inHistoryModus = false;
+let historyIsSearchingAndLoadingTimeout = null;
+
 document.getElementById('notificationList').hidden = true;
+document.getElementById('historyDtPicker').hidden = true;
 if ('serviceWorker' in navigator && 'PushManager' in window) {
     navigator.serviceWorker.register('serviceWorker.js').then(function (swReg) {
         swRegistration = swReg;
@@ -34,7 +38,7 @@ function load2Json(url) {
                 resolve(xmlHttpRequest.response);
             }
             else {
-                reject(Error(xmlHttpRequest.statusText));
+                reject(Error(xmlHttpRequest.status));
             }
         };
 
@@ -46,6 +50,24 @@ function load2Json(url) {
     });
 }
 
+function loadMatrixJson(fileName) {
+    return new Promise(function (resolve) {
+        const originalFilename = fileName;
+        if (fileName !== 'liveData' && inHistoryModus) {
+            fileName = 'history/' + fileName.substring(0, 16).replace(':', '_');
+        }
+
+        load2Json('live/' + fileName + '.json?' + Math.floor(Date.now() / 1000)).then(function (result) {
+            resolve(result);
+        }).catch(function (error) {
+            if (inHistoryModus && error.message === "404") {
+                const newFileName = new Date(new Date(originalFilename).getTime() - 60000).toISOString();
+                resolve(loadMatrixJson(newFileName));
+            }
+        });
+    });
+}
+
 function sendRequest(type, url, data, callback) {
     var request = new XMLHttpRequest();
     request.open(type, url, true);
@@ -53,7 +75,7 @@ function sendRequest(type, url, data, callback) {
     request.onreadystatechange = function () {
         if (callback && this.readyState == XMLHttpRequest.DONE)
             callback(this.status);
-    }
+    };
     request.send(JSON.stringify(data));
 }
 
@@ -146,6 +168,12 @@ function initMap() {
     const notificationList = document.getElementById('notificationList');
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(notificationList);
 
+    const historyDtPicker = document.getElementById('historyDtPicker');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(historyDtPicker);
+
+    const historyButton = document.getElementById('historyButton');
+    map.controls[google.maps.ControlPosition.RIGHT_TOP].push(historyButton);
+
     //const signsCopyGertDiv = document.getElementById('signsCopyGert');
     //map.controls[google.maps.ControlPosition.TOP_LEFT].push(signsCopyGertDiv);
 
@@ -229,6 +257,23 @@ function initMap() {
     setTimeout(fillNotificationList, 1000);
 }
 
+function toggleHistoryModus() {
+    if (!inHistoryModus) {
+        inHistoryModus = true;
+        document.querySelector('#typeShown [value="' + ShownType.Matrix + '"]').selected = true;
+        document.getElementById('notificationList').hidden = true;
+    }
+    else {
+        fillNotificationList();
+        inHistoryModus = false;
+        document.querySelector('#typeShown [value="' + ShownType.Both + '"]').selected = true;
+    }
+
+    document.getElementById('typeShown').disabled = inHistoryModus;
+    document.getElementById('historyDtPicker').hidden = !inHistoryModus;
+    triggerGoogleMapsIdleEvent();
+}
+
 function placePointsOnMap() {
     return new Promise(function (resolve, reject) {
         const visiblePoints = new Map();
@@ -285,7 +330,7 @@ function loadMatrixInfo() {
 }
 
 function loadStaticMatrixen() {
-    load2Json('static/locations.json?1530906071').then(function (locationsJson) {
+    load2Json('static/locations.json?1570232560').then(function (locationsJson) {
         return JSON.parse(locationsJson);
     }).then(function (locations) {
         locations.forEach(function (location) {
@@ -319,8 +364,11 @@ function loadStaticMatrixen() {
     });
 }
 
-function loadLiveMatrixInfo() {
-    load2Json('live/liveData.json?' + Math.floor(Date.now() / 1000)).then(function (liveDataJson) {
+function loadLiveMatrixInfo(fileName = 'liveData') {
+    if (fileName === 'liveData' && inHistoryModus)
+        return;
+
+    loadMatrixJson(fileName).then(function (liveDataJson) {
         return JSON.parse(liveDataJson);
     }).then(function (liveData) {
         liveData.forEach(function (liveVms) {
@@ -398,6 +446,7 @@ function getParamByName(name) {
 window.addEventListener('load', function () {
     document.querySelector('select[name="typeShown"]').onchange = onTypeShownChanged;
     document.querySelector('select[name="notificationList"]').onchange = onNotificationListChanged;
+    document.getElementById('historyDtPicker').onchange = onHistoryDtPickerChanged;
 }, false);
 
 function onTypeShownChanged(event) {
@@ -416,6 +465,16 @@ function onNotificationListChanged(event) {
         lng: parseFloat(coordinates[1])
     });
     map.setZoom(17);
+}
+
+function onHistoryDtPickerChanged(event) {
+    clearTimeout(historyIsSearchingAndLoadingTimeout);
+
+    historyIsSearchingAndLoadingTimeout = setTimeout(function () {
+        const localDt = new Date(event.target.value);
+        const fileName = new Date(localDt.getTime()).toISOString();
+        loadLiveMatrixInfo(fileName);
+    }, 500);
 }
 
 function triggerGoogleMapsIdleEvent() {

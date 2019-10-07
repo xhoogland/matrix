@@ -135,11 +135,13 @@ namespace Matrix.Services
                     if (JsonConvert.SerializeObject(roadWay) == JsonConvert.SerializeObject(previousRoadWay))
                         continue;
 
-                    foreach (var vms in roadWay.VariableMessageSigns)
+                    foreach (var subscribedVms in roadWay.VariableMessageSigns)
                     {
-                        var id = vms.Id;
+                        var id = subscribedVms.Id;
 
-                        vms.Sign = Reformat(id, _liveData.SingleOrDefault(l => l.Id == id).Sign);
+                        var liveVms = _liveData.SingleOrDefault(l => l.Id == id);
+                        var sign = liveVms != null ? liveVms.Sign : "unknown";
+                        subscribedVms.Sign = Reformat(id, sign);
                     }
 
                     var body = string.Join(' ', roadWay.VariableMessageSigns);
